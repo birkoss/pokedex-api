@@ -1,0 +1,11 @@
+body {
+	background-color: #f4f4f4;
+}
+
+main > .card {
+	padding: 40px;
+}
+
+main > .card > table.table {
+	margin-bottom: 0;
+}
