@@ -1,6 +1,10 @@
 asgiref==3.2.3
 Django==3.0.3
+django-appconf==1.0.3
+django-compressor==2.4
 django-modeltranslation==0.14.4
 pytz==2019.3
+rcssmin==1.0.6
+rjsmin==1.1.0
 six==1.14.0
 sqlparse==0.3.0
