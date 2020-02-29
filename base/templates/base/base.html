@@ -1,50 +1,14 @@
-{% load static %}
-{% load compress %}
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+{% extends 'base/template.html' %}
 
-		<link rel="icon" href="{% static 'base/favicon.ico' %}" />
-
-		{% compress css %}
-		<link href="{% static 'base/css/bootstrap.min.css' %}" rel="stylesheet" />
-		<link href="{% static 'base/css/site.css' %}" rel="stylesheet" />
-		{% endcompress %}
-
-		<title>Pokedex</title>
-	</head>
-	<body>
-		<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-			<a class="navbar-brand" href="/">Pokedex</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarCollapse">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item active">
-						<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-					</li>
-				</ul>
-			</div>
-		</nav>
-
-		<main role="main" class="container">
-			<div class="card">
-				{% block content %}{% endblock %}
-			</div>
+{% block base %}
+<div id="layoutBase">
+	<div id="layoutBase_content">
+		<main>
+			{% block content %}{% endblock %}
 		</main>
-
-
-
-
-		{% compress js %}
-		<script src="{% static 'base/js/jquery-3.4.1.slim.min.js' %}"></script>
-		<script src="{% static 'base/js/popper.min.js' %}"></script>
-		<script src="{% static 'base/js/bootstrap.min.js' %}"></script>
-
-		<script src="{% static 'base/js/scripts.js' %}"></script>
-		{% endcompress %}
-	</body>
-</html>
+	</div>
+	<div id="layoutBase_footer">
+		{% include "base/footer.html" %}
+	</div>
+</div>
+{% endblock %}

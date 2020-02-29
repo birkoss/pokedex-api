@@ -1,0 +1,62 @@
+{% load static %}
+{% load compress %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		<meta name="description" content="" />
+		<title>{% block page_title %}Living Pokedex Tracker{% endblock %}</title>
+		{% compress css %}
+			<link href="{% static 'base/css/admin.css' %}" rel="stylesheet" />
+			<link href="{% static 'base/css/bootstrap.css' %}" rel="stylesheet" />
+			<link href="{% static 'base/css/app.css' %}" rel="stylesheet" />
+			<link href="{% static 'base/css/pokemon.css' %}" rel="stylesheet" />
+		{% endcompress %}
+		<script src="{% static 'base/js/font-awesome.js' %}"></script>
+		<link rel="icon" href="{% static 'base/favicon.ico' %}" />
+	</head>
+
+	<body class="sb-nav-fixed">
+		<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+			<a class="navbar-brand" href="/">Living Pokedex Tracker</a>
+
+			{% block sidebar_wrapper %}
+				{% if sidebar %}
+					<button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
+				{% endif %}
+			{% endblock %}
+
+			<!-- Navbar-->
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'login' %}">Login</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'register' %}">Register</a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+						<a class="dropdown-item" href="#">Settings</a>
+						<a class="dropdown-item" href="#">Activity Log</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#">Logout</a>
+					</div>
+				</li>
+			</ul>
+		</nav>
+
+		{% block base %}{% endblock %}
+
+		{% compress js %}
+			<script src="{% static 'base/js/jquery.js' %}"></script>
+			<script src="{% static 'base/js/bootstrap.js' %}"></script>
+			<script src="{% static 'base/js/admin.js' %}"></script>
+			<script src="{% static 'base/js/jquery-datatables.js' %}"></script>
+			<script src="{% static 'base/js/bootstrap-datatables.js' %}"></script>
+			<script src="{% static 'base/js/app.js' %}"></script>
+		{% endcompress %}
+	</body>
+</html>

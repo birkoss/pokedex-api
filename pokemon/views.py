@@ -10,7 +10,16 @@ from pokemon.models import Pokemon, Generation
 def index(request):
 	pokemons = Pokemon.objects.all()
 
-	return render(request, "pokemon/index.html", {'pokemons': pokemons})
+	return render(request, "pokemon/index.html", {
+		'pokemons': pokemons,
+		'mode': 'grid'
+	})
+
+
+def pokemon_detail(request, pokemon_number=None):
+	pokemon = get_object_or_404(Pokemon, number=pokemon_number)
+
+	return render(request, "pokemon/detail.html", {'pokemon': pokemon})
 
 
 def import_pokemon(request):

@@ -1,21 +1,50 @@
-{% extends 'base/base.html' %}
+{% extends 'base/base_sidebar.html' %}
+
+{% block sidebar_wrapper %}
+	{% with sidebar=True sidebar_width=4 %}
+		{{ block.super }}
+	{% endwith%}
+{% endblock %}
+
 {% block content %}
+<div class="container-fluid">
+	<h1 class="mt-4">Dashboard</h1>
+	<ol class="breadcrumb mb-4">
+		<li class="breadcrumb-item active">Dashboard</li>
+	</ol>
+	<div class="card mb-4">
+		<div class="card-header"><i class="fas fa-table mr-1"></i>DataTable Example</div>
+		<div class="card-body">
 
-	<table class="table table-striped table-hover">
-		<thead>
-			<tr>
-				<th>Number</th>
-				<th>Name</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for make in pokemons %}
-				<tr>
-					<td><a href="#\{% url 'detail' make.slug %\}">{{ make.number }}</a></td>
-					<td><a href="#\{% url 'detail' make.slug %\}">{{ make.name }}</a></td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-
+		{% if mode == 'grid!' %}
+			<div class="pokemons-grid">
+				{% for pokemon in pokemons %}
+					<div class="pokemon"><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></div>
+				{% endfor %}
+			</div>
+		{% else %}
+				<div class="table-responsive">
+					<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+						<thead>
+							<tr>
+								<th>&nbsp;</th>
+								<th>Number</th>
+								<th>Name</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for pokemon in pokemons %}
+								<tr>
+									<td><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
+									<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.number }}</a></td>
+									<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.name }}</a></td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+		{% endif %}
+		</div>
+	</div>
+</div>
 {% endblock %}

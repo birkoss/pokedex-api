@@ -1,0 +1,39 @@
+body {
+	background-color: #f4f4f4;
+}
+
+main > .card {
+	padding: 40px;
+}
+
+main > .card > table.table {
+	margin-bottom: 0;
+}
+
+.pokemon-image {
+    background-image: url(../sprites/pokemons.png);
+    background-repeat: no-repeat;
+}
+
+table.pokemons-list td {
+	vertical-align: middle !important;
+}
+
+.pokemons-grid {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+/* This is used to prevent the last row, with missing items to be out of the normal grid */
+.pokemons-grid:after {
+	content: "";
+	flex: auto;
+}
+
+a.pokemon-sprite:before {
+	background-image: url(../sprites/pokemons.png);
+	background-repeat: no-repeat;
+	content: " ";
+	display: block;
+}
