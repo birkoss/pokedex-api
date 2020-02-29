@@ -78,10 +78,13 @@ gettext = lambda s: s
 LANGUAGES = (
     ('en', gettext('English')),
     ('fr', gettext('French')),
+    ('jp', gettext('Japanese')),
+    ('de', gettext('German')),
+    ('kr', gettext('Korean')),
 )
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
-MODELTRANSLATION_LANGUAGES = ('en', 'fr')
+MODELTRANSLATION_LANGUAGES = ('en', 'fr', 'jp', 'de', 'kr')
 USE_MODELTRANSLATION = True
 
 

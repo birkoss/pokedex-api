@@ -7,4 +7,5 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 
 	path('', pokemon_views.index, name='index'),
+	path('import', pokemon_views.import_pokemon, name='import'),
 ]
