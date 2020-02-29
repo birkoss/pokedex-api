@@ -6,3 +6,4 @@ __pycache__/
 tmp/
 passenger_wsgi.py
 project/config.py
+stderr.log
