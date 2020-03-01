@@ -8,9 +8,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 		<meta name="description" content="" />
 		<title>{% block page_title %}Living Pokedex Tracker{% endblock %}</title>
-		{% compress css %}
-			<link href="{% static 'base/css/bootstrap.css' %}" rel="stylesheet" />
-		{% endcompress %}
 		<link rel="icon" href="{% static 'base/favicon.ico' %}" />
 	</head>
 
@@ -47,9 +44,10 @@
 		{% block base %}{% endblock %}
 
 		{% compress css %}
-			<link href="{% static 'base/css/admin.css' %}" rel="stylesheet" />
-			<link href="{% static 'base/css/app.css' %}" rel="stylesheet" />
-			<link href="{% static 'base/css/pokemon.css' %}" rel="stylesheet" />
+			<link href="{% static 'base/css/admin.css' %}" rel="stylesheet" async />
+			<link href="{% static 'base/css/bootstrap.css' %}" rel="stylesheet" async />
+			<link href="{% static 'base/css/app.css' %}" rel="stylesheet" async />
+			<link href="{% static 'base/css/pokemon.css' %}" rel="stylesheet" async />
 		{% endcompress %}
 
 		{% compress js %}
