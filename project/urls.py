@@ -7,7 +7,8 @@ from base import views as base_views
 urlpatterns = [
 	path('admin/', admin.site.urls),
 
-	path('', pokemon_views.index, name='index'),
+	path('', pokemon_views.index, name='pokemon_list'),
+	path('<int:page>/', pokemon_views.index, name='pokemon_list_page'),
 	path('login/', base_views.login, name='login'),
 	path('register/', base_views.register, name='register'),
 	path('forgot-password/', base_views.forgot_password, name='forgot_password'),

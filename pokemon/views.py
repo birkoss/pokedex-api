@@ -1,18 +1,31 @@
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 
 import urllib.request
 import json
+import math
 from urllib.request import urlopen, Request
 
 from pokemon.models import Pokemon, Generation
 
-def index(request):
-	pokemons = Pokemon.objects.all()
+def index(request, page=1):
+	# @TODO : Logged = datatable, unlogged = pagination
+	pagination = 30
+	pokemons_list = Pokemon.objects.all()
+
+	paginator = Paginator(pokemons_list, pagination)
+
+	try:
+		pokemons = paginator.page(page)
+	except PageNotAnInteger:
+		pokemons = paginator.page(1)
+	except EmptyPage:
+		pokemons = paginator.page(paginator.num_pages)
 
 	return render(request, "pokemon/index.html", {
 		'pokemons': pokemons,
-		'mode': 'grid'
+		'mode': 'list'
 	})
 
 
