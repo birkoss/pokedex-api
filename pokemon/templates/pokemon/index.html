@@ -16,7 +16,7 @@
 		<div class="card-header"><i class="fas fa-table mr-1"></i>DataTable Example</div>
 		<div class="card-body">
 
-		{% if mode == 'grid!' %}
+		{% if mode == 'grid' %}
 			<div class="pokemons-grid">
 				{% for pokemon in pokemons %}
 					<div class="pokemon"><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></div>
