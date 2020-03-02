@@ -1,15 +1,33 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-def login(request):
-
-	return render(request, "base/login.html")
+from social_django.models import UserSocialAuth
 
 
-def register(request):
+@login_required
+def profile(request):
+	user = request.user
 
-	return render(request, "base/register.html")
+	try:
+		github_login = user.social_auth.get(provider='github')
+	except UserSocialAuth.DoesNotExist:
+		github_login = None
 
+	try:
+		google_login = user.social_auth.get(provider='google-oauth2')
+	except UserSocialAuth.DoesNotExist:
+		google_login = None
 
-def forgot_password(request):
+	try:
+		facebook_login = user.social_auth.get(provider='facebook')
+	except UserSocialAuth.DoesNotExist:
+		facebook_login = None
 
-	return render(request, "base/forgot_password.html")
+	can_disconnect = (user.social_auth.count() > 1)
+
+	return render(request, 'base/profile.html', {
+		'github_login': github_login,
+		'google_login': google_login,
+		'facebook_login': facebook_login,
+		'can_disconnect': can_disconnect
+	})

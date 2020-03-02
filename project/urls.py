@@ -1,5 +1,7 @@
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.urls import path
+
 
 from pokemon import views as pokemon_views
 from base import views as base_views
@@ -9,9 +11,11 @@ urlpatterns = [
 
 	path('', pokemon_views.index, name='pokemon_list'),
 	path('<int:page>/', pokemon_views.index, name='pokemon_list_page'),
-	path('login/', base_views.login, name='login'),
-	path('register/', base_views.register, name='register'),
-	path('forgot-password/', base_views.forgot_password, name='forgot_password'),
+	
+	path('dashboard/', pokemon_views.index, name='user_dashboard'),
+	path('dashboard/profile/', base_views.profile, name='user_profile'),
+
 	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_detail, name='pokemon_detail'),
 	path('import', pokemon_views.import_pokemon, name='import'),
+	url(r'^oauth/', include('social_django.urls', namespace='social')),
 ]

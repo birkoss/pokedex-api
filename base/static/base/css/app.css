@@ -37,3 +37,9 @@ a.pokemon-sprite:before {
 	content: " ";
 	display: block;
 }
+
+.user-profile .social-media:not(:first-child) {
+	margin-top: 20px;
+	border-top: 1px solid #ccc;
+	padding-top: 20px;
+}

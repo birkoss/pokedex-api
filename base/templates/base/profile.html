@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+
+{% block page_title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container user-profile">
+	<div class="row justify-content-center">
+		<div class="col-lg-5">
+			<div class="card shadow-lg border-0 rounded-lg mt-5">
+				<div class="card-header"><h3 class="text-center font-weight-light my-4">Profile</h3></div>
+				<div class="card-body">
+					<div class="small mb-3 text-muted social-media">Google</div>
+					{% if google_login %}
+						<p>Connected as <strong>{{ google_login }}</strong></p>
+						{% if can_disconnect %}
+							<form method="post" action="{% url 'social:disconnect' 'google-oauth2' %}">
+								{% csrf_token %}
+								<button class="btn btn-primary" type="submit">Disconnect from Google</button>
+							</form>
+						{% endif %}
+					{% else %}
+						<a class="btn btn-primary" href="{% url 'social:begin' 'google-oauth2' %}">Connect to Google</a>
+					{% endif %}
+
+					<div class="small mb-3 text-muted social-media">Facebook</div>
+					{% if facebook_login %}
+						<p>Connected as <a href="https://facebook.com/{{ facebook_login.extra_data.id }}/" target="_blank">{{ facebook_login.extra_data.id }}</a></p>
+						{% if can_disconnect %}
+							<form method="post" action="{% url 'social:disconnect' 'facebook' %}">
+								{% csrf_token %}
+								<button class="btn btn-primary" type="submit">Disconnect from Facebook</button>
+							</form>
+						{% endif %}
+					{% else %}
+						<a class="btn btn-primary" href="{% url 'social:begin' 'facebook' %}">Connect to Facebook</a>
+					{% endif %}
+
+					<div class="small mb-3 text-muted social-media">GitHub</div>
+					{% if github_login %}
+						<p>Connected as <a href="https://github.com/{{ github_login.extra_data.login }}/" target="_blank">{{ github_login.extra_data.login }}</a></p>
+						{% if can_disconnect %}
+							<form method="post" action="{% url 'social:disconnect' 'github' %}">
+								{% csrf_token %}
+								<button class="btn btn-primary" type="submit">Disconnect from GitHub</button>
+							</form>
+						{% endif %}
+					{% else %}
+						<a class="btn btn-primary" href="{% url 'social:begin' 'github' %}">Connect to GitHub</a>
+					{% endif %}
+
+				</div>
+				<div class="card-footer text-center">
+					<div class="small"><a href="{% url 'user_dashboard' %}">Return to the dashboard</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
