@@ -1,6 +1,19 @@
-{% extends 'base/base.html' %}
+{% extends 'base/base_sidebar.html' %}
+
 {% block content %}
-
-Name : {{ pokemon.name }}
-
+<div class="container-fluid">
+	<h1 class="mt-4">{{ pokemon.name }}</h1>
+	<div class="card mb-4">
+		<div class="card-header"><i class="fas fa-table mr-1"></i>Options</div>
+		<div class="card-body">...</div>
+	</div>
+	<div class="card mb-4">
+		<div class="card-header"><i class="fas fa-table mr-1"></i>Variants</div>
+		<div class="card-body">...</div>
+	</div>
+	<div class="card mb-4">
+		<div class="card-header"><i class="fas fa-table mr-1"></i>Languages</div>
+		<div class="card-body">...</div>
+	</div>
+</div>
 {% endblock %}

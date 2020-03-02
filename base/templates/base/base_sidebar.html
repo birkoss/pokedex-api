@@ -1,5 +1,11 @@
 {% extends 'base/template.html' %}
 
+{% block sidebar_wrapper %}
+	{% with sidebar=True sidebar_width=4 %}
+		{{ block.super }}
+	{% endwith%}
+{% endblock %}
+
 {% block base %}
 <div id="layoutSidenav">
 	<div id="layoutSidenav_nav">
@@ -47,14 +53,12 @@
 
 				</div>
 			</div>
-			<div class="sb-sidenav-footer">
-				<div class="small">Logged in as:</div>
-				{% if user %}
+			{% if user.is_authenticated %}
+				<div class="sb-sidenav-footer">
+					<div class="small">Logged in as:</div>
 					{{ user.username }}
-				{% else %}
-					Unlogged
-				{% endif %}
-			</div>
+				</div>
+			{% endif %}
 		</nav>
 	</div>
 	<div id="layoutSidenav_content">

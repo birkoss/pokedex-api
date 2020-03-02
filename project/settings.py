@@ -75,8 +75,8 @@ AUTHENTICATION_BACKENDS = (
 
 #LOGIN_URL = 'login'
 #LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = 'user_dashboard'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'user_profile'
+LOGIN_REDIRECT_URL = 'pokemon_list'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'pokemon_list'
 
 
 # Internationalization

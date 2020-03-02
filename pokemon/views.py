@@ -10,6 +10,7 @@ from urllib.request import urlopen, Request
 from pokemon.models import Pokemon, Generation
 
 def index(request, page=1):
+	print( type(request.user) )
 	# @TODO : Logged = datatable, unlogged = pagination
 	pagination = 30
 	pokemons_list = Pokemon.objects.all()

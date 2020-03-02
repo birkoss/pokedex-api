@@ -1,11 +1,19 @@
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from social_django.models import UserSocialAuth
 
 
 @login_required
-def profile(request):
+def user_logout(request):
+	logout(request)
+
+	return redirect('pokemon_list')
+
+
+@login_required
+def user_profile(request):
 	user = request.user
 
 	try:
