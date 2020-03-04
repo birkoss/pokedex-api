@@ -18,7 +18,7 @@
 		{% endcompress %}
 	</head>
 
-	<body class="sb-nav-fixed">
+	<body class="sb-nav-fixed{% if user.is_authenticated %} logged-in{% endif %}">
 		<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
 			<a class="navbar-brand" href="{% url 'pokemon_list' %}">Living Pokedex Tracker</a>
 

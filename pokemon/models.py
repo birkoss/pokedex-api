@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from birkoss.utils import slugify_model
 
@@ -37,3 +38,9 @@ class Pokemon(models.Model):
 		return self.name
 
 
+class UserPokemon(models.Model):
+	pokemon = models.ForeignKey(Pokemon, blank=True, null=True, on_delete = models.PROTECT)
+	user = models.ForeignKey(User, blank=True, null=True, on_delete = models.PROTECT)
+
+	is_owned = models.BooleanField(default=False)
+	is_shiny = models.BooleanField(default=False)

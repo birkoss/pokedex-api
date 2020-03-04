@@ -9,12 +9,14 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 
 	path('', pokemon_views.index, name='pokemon_list'),
+	path('test', pokemon_views.test, name='pokemon_test'),
 	path('<int:page>/', pokemon_views.index, name='pokemon_list_page'),
 	
 	path('logout/', base_views.user_logout, name='logout'),
 	path('dashboard/', pokemon_views.index, name='user_dashboard'),
 	path('dashboard/profile/', base_views.user_profile, name='user_profile'),
 
+	path('pokemon/<str:pokemon_number>/toggle', pokemon_views.pokemon_toggle, name='pokemon_toggle'),
 	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_detail, name='pokemon_detail'),
 	path('import', pokemon_views.import_pokemon, name='import'),
 	url(r'^oauth/', include('social_django.urls', namespace='social')),

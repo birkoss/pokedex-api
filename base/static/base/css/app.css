@@ -43,3 +43,7 @@ a.pokemon-sprite:before {
 	border-top: 1px solid #ccc;
 	padding-top: 20px;
 }
+
+.actions a {
+	font-size: 24px;
+}

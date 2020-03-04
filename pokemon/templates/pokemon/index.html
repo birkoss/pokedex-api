@@ -1,10 +1,46 @@
 {% extends 'base/base_sidebar.html' %}
 
 {% block content %}
+
+{% if user.is_authenticated %}
+<script type="text/javascript">var ajax_csrf_token = "{{ csrf_token }}";</script>
+{% endif %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Pokemon name</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="form-group form-check">
+						<div class="">
+							<input class="form-check-input" type="checkbox" id="gridCheck1">
+							<label class="form-check-label" for="gridCheck1">Owned ?</label>
+						</div>
+					</div>
+					<div class="form-group form-check">
+						<div class="">
+							<input class="form-check-input" type="checkbox" id="gridCheck1">
+							<label class="form-check-label" for="gridCheck1">Owned ?</label>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary">Save changes</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="container-fluid">
 	<h1 class="mt-4">Dashboard</h1>
 	<div class="card mb-4">
-		<div class="card-header"><i class="fas fa-table mr-1"></i>{{ pokemons.paginator.count }} Pokemons ({{ pokemons.paginator.num_pages }} page(s))</div>
+		<div class="card-header"><i class="fas fa-table mr-1"></i>{{ pokemons.count }} Pokemons ({{ pokemons.paginator.num_pages }} page(s))</div>
 		<div class="card-body">
 
 		{% if mode == 'grid' %}
@@ -14,71 +50,40 @@
 				{% endfor %}
 			</div>
 		{% else %}
-				<div class="table-responsive">
-					<table class="table table-bordered pokemons-list" id="pokemons-list" width="100%" cellspacing="0">
-						<thead>
-							<tr>
-								<th>&nbsp;</th>
-								<th>Number</th>
-								<th>Name</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for pokemon in pokemons %}
-								<tr>
-									<td><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
-									<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.number }}</a></td>
-									<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.name }}</a></td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-
-				{% if pokemons.has_other_pages %}
-					<ul class="pagination">
-						{% if pokemons.has_previous %}
-							<li class="page-item"><a class="page-link" href="{% url 'pokemon_list_page' pokemons.previous_page_number %}">&laquo;</a></li>
-						{% else %}
-							<li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-						{% endif %}
-
-						{% for i in pokemons.paginator.page_range %}
-							{% if pokemons.number == i %}
-								<li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
-							{% elif i == 0 %}
-								<li class="page-item"><a class="page-link" href="{% url 'pokemon_list' %}">{{ i }}</a></li>
-							{% else %}
-								<li class="page-item"><a class="page-link" href="{% url 'pokemon_list_page' i %}">{{ i }}</a></li>
+			<div class="table-responsive">
+				<table class="table table-bordered pokemons-list" id="pokemons-list" width="100%" cellspacing="0">
+					<thead>
+						<tr>
+							<th width="30">#</th>
+							<th>&nbsp;</th>
+							<th>Name</th>
+							{% if user.is_authenticated %}
+								<th>Actions</th>
 							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for pokemon in pokemons %}
+							<tr>
+								<td>{{ pokemon.number }}</td>
+								<td><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
+								<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.name }}</a></td>
+								{% if user.is_authenticated %}
+									<td class="actions">
+										{% if pokemon.is_owned is not True %}
+											<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-check"></i> Mark as Owned</button>
+										{% endif %}
+
+										{% if pokemon.is_owned is True %}
+											<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Options</button>
+										{% endif %}
+									</td>
+								{% endif %}
+							</tr>
 						{% endfor %}
-
-						{% if pokemons.has_next %}
-							<li class="page-item"><a class="page-link pagination-next" href="{% url 'pokemon_list_page' pokemons.next_page_number %}">&raquo;</a></li>
-						{% else %}
-							<li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-						{% endif %}
-					</ul>
-
-					<div class="page-load-status">
-						<p class="infinite-scroll-request">
-							<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-								<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
-									<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
-								</circle>
-								<circle cx="40.3735" cy="50" fill="#4c4b49" r="20">
-									<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="0s"></animate>
-								</circle>
-								<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
-									<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
-								<animate attributeName="fill-opacity" values="0;0;1;1" calcMode="discrete" keyTimes="0;0.499;0.5;1" dur="1s" repeatCount="indefinite"></animate>
-								</circle>
-							</svg>
-						</p>
-						<p class="infinite-scroll-last">End of content</p>
-						<p class="infinite-scroll-error">No more pages to load</p>
-					</div>
-				{% endif %}
+					</tbody>
+				</table>
+			</div>
 		{% endif %}
 		</div>
 	</div>
