@@ -1,15 +1,15 @@
 // Call the dataTables jQuery plugin
 jQuery(document).ready(function() {
 	jQuery('body.logged-in #pokemons-list').DataTable();
-/*
-	jQuery('table.pokemons-list tbody').infiniteScroll({
+
+	jQuery('body:not(.logged-in) table.pokemons-list tbody').infiniteScroll({
 		path: '.pagination-next',
 		append: 'table.pokemons-list tbody tr',
 		//history: 'push',
 		hideNav: '.pagination',
 		status: '.page-load-status'
 	});
-*/
+
 });
 
 function pokemon_change_option(pokemon_number, option_name) {

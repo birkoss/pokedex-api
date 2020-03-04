@@ -99,7 +99,7 @@ def index(request, page=1):
 	pagination = 30
 
 	if request.user.is_authenticated:
-		pokemons_qs = Pokemon.objects.annotate(
+		pokemons_list = Pokemon.objects.annotate(
 			t=FilteredRelation(
 				'userpokemon', condition=(Q(userpokemon__user=request.user) | Q(userpokemon__isnull=True))
 			)
@@ -113,20 +113,17 @@ def index(request, page=1):
 			"name", "number"
 		)
 
-	print(page)
+		paginator = Paginator(pokemons_qs, pagination)
 
-
-	paginator = Paginator(pokemons_qs, pagination)
-
-	try:
-		pokemons_list = paginator.page(page)
-	except PageNotAnInteger:
-		pokemons_list = paginator.page(1)
-	except EmptyPage:
-		pokemons_list = paginator.page(paginator.num_pages)
+		try:
+			pokemons_list = paginator.page(page)
+		except PageNotAnInteger:
+			pokemons_list = paginator.page(1)
+		except EmptyPage:
+			pokemons_list = paginator.page(paginator.num_pages)
 
 	pokemons = []
-	for single_pokemon in pokemons_qs:
+	for single_pokemon in pokemons_list:
 		pokemon = {
 			'name': single_pokemon['name'],
 			'number': single_pokemon['number'],
@@ -143,7 +140,8 @@ def index(request, page=1):
 
 	return render(request, "pokemon/index.html", {
 		'pokemons': pokemons,
-		'mode': 'list'
+		'mode': 'list',
+		'paginator': pokemons_list
 	})
 
 
