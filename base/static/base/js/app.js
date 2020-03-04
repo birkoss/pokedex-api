@@ -1,6 +1,6 @@
 // Call the dataTables jQuery plugin
 jQuery(document).ready(function() {
-	jQuery('#pokemons-list').DataTable();
+	jQuery('body.logged-in #pokemons-list').DataTable();
 /*
 	jQuery('table.pokemons-list tbody').infiniteScroll({
 		path: '.pagination-next',

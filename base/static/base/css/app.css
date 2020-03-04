@@ -47,3 +47,29 @@ a.pokemon-sprite:before {
 .actions a {
 	font-size: 24px;
 }
+
+@media screen and (max-width: 600px) {
+	.main-pokemons-list .card-header {
+		display: none;
+	}
+	table.pokemons-list thead {
+		display: none;
+	}
+	table.pokemons-list tbody {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+	table.pokemons-list tbody tr {
+		display: flex;
+	}
+
+	table.pokemons-list tbody tr > td {
+		display: none;
+	}
+	table.pokemons-list tbody tr > td.sprite {
+		display: block;
+		padding: 0;
+		border: 0;
+	}
+}

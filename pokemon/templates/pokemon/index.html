@@ -37,10 +37,10 @@
 	</div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid main-pokemons-list">
 	<h1 class="mt-4">Dashboard</h1>
 	<div class="card mb-4">
-		<div class="card-header"><i class="fas fa-table mr-1"></i>{{ pokemons.count }} Pokemons ({{ pokemons.paginator.num_pages }} page(s))</div>
+		<div class="card-header"><i class="fas fa-table mr-1"></i>{{ pokemons.count }} Pokemons</div>
 		<div class="card-body">
 
 		{% if mode == 'grid' %}
@@ -66,7 +66,7 @@
 						{% for pokemon in pokemons %}
 							<tr>
 								<td>{{ pokemon.number }}</td>
-								<td><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
+								<td class="sprite"><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
 								<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.name }}</a></td>
 								{% if user.is_authenticated %}
 									<td class="actions">
