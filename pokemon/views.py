@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import FilteredRelation, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -98,18 +98,23 @@ def index(request, page=1):
 	# @TODO : Logged = datatable, unlogged = pagination
 	pagination = 30
 
-	pokemons_qs = Pokemon.objects.annotate(
-		t=FilteredRelation(
-			'userpokemon', condition=(Q(userpokemon__user=request.user) | Q(userpokemon__isnull=True))
+	if request.user.is_authenticated:
+		pokemons_qs = Pokemon.objects.annotate(
+			t=FilteredRelation(
+				'userpokemon', condition=(Q(userpokemon__user=request.user) | Q(userpokemon__isnull=True))
+			)
+		).filter(
+			
+		).values(
+			"name", "number", "t__is_owned", "t__is_shiny"
 		)
-	).filter(
-		
-	).values(
-		"name", "number", "t__is_owned", "t__is_shiny"
-	)
+	else:
+		pokemons_qs = Pokemon.objects.all().values(
+			"name", "number"
+		)
 
-	print("Query:")
-	print(pokemons_qs.query)
+	print(page)
+
 
 	paginator = Paginator(pokemons_qs, pagination)
 
@@ -122,12 +127,19 @@ def index(request, page=1):
 
 	pokemons = []
 	for single_pokemon in pokemons_qs:
-		pokemons.append({
+		pokemon = {
 			'name': single_pokemon['name'],
 			'number': single_pokemon['number'],
-			'is_owned': single_pokemon['t__is_owned'],
-			'is_shiny': single_pokemon['t__is_shiny'],
-		})
+			'is_owned': None,
+			'is_shiny': None,
+
+		}
+
+		if request.user.is_authenticated:
+			pokemon['is_owned'] = single_pokemon['t__is_owned']
+			pokemon['is_shiny'] = single_pokemon['t__is_shiny']
+		
+		pokemons.append(pokemon)
 
 	return render(request, "pokemon/index.html", {
 		'pokemons': pokemons,
