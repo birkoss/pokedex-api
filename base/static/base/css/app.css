@@ -134,7 +134,7 @@ a.pokemon-sprite:before {
 }
 
 body.logged-in a.pokemon-sprite:not(.is-owned):before {
-	opacity: 0.2;
+	opacity: 0.5;
 }
 
 /* Error 404 */
