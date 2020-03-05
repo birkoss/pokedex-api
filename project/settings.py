@@ -12,6 +12,7 @@ INSTALLED_APPS = [
     'pokemon'
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -23,7 +24,9 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
+
 ROOT_URLCONF = 'project.urls'
+
 
 TEMPLATES = [
     {
@@ -43,11 +46,9 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
-# Password validation
-# https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -64,6 +65,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.github.GithubOAuth2',
     'social_core.backends.google.GoogleOAuth2',
@@ -73,24 +75,17 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-#LOGIN_URL = 'login'
-#LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'pokemon_list'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'pokemon_list'
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
+
 
 gettext = lambda s: s
 LANGUAGES = (
@@ -100,6 +95,7 @@ LANGUAGES = (
     ('de', gettext('German')),
     ('kr', gettext('Korean')),
 )
+
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
 MODELTRANSLATION_LANGUAGES = ('en', 'fr', 'jp', 'de', 'kr')
@@ -111,5 +107,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 )
+
 
 from .config import *
