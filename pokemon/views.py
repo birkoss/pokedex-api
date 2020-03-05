@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db import connection
 from django.db.models import FilteredRelation, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -12,7 +13,82 @@ from urllib.request import urlopen, Request
 from pokemon.models import Pokemon, Generation, UserPokemon
 
 
-def pokemon_toggle(request, pokemon_number):
+@login_required
+def pokemon_options(request, pokemon_number):
+	if request.method == "GET":
+		pokemon = Pokemon.objects.filter(number=pokemon_number).first()
+
+		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
+
+		return render(request, "pokemon/options.html", {
+			'pokemon': pokemon,
+			'options': pokemon_options
+		})
+
+	if request.method == "POST":
+		response = {
+			"status": "pending"
+		}
+
+		# Must parse a valid JSON from $_POST['options']
+		try:
+			options = json.loads(request.POST.get("options"))
+		except json.decoder.JSONDecodeError:
+			response['status'] = "error"
+			response['msg'] = "Invalid options!"
+			return JsonResponse(response)			
+
+		# Must have at least ONE valid
+		if len(options) == 0:
+			response['status'] = "error"
+			response['msg'] = "You must specific at least one option!"
+			return JsonResponse(response)
+
+		# Must be logged in first
+		if not request.user.is_authenticated:
+			response['status'] = "error"
+			response['msg'] = "You must be logged in!"
+			return JsonResponse(response)
+
+		# Must be a valid Pokemon from $_GET['pokemon_number']
+		pokemon = Pokemon.objects.filter(number=pokemon_number).first()
+		if pokemon is None:
+			response['status'] = "error"
+			response['msg'] = "This pokemon doesn't exist!"
+			return JsonResponse(response)
+
+		# Get the existing UserPokemon for this user and pokemon if possible, else create it
+		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
+		if pokemon_options is None:
+			pokemon_options = UserPokemon(pokemon=pokemon, user=request.user)
+			pokemon_options.save()
+
+		# Try to update each options, they must all be valid
+		for option_name in options:
+			try:
+				option_new_value = options[option_name]
+				option_existing_value = getattr(pokemon_options, option_name)
+
+				# -1 means to toggle the existing value
+				if option_new_value == -1:
+					option_new_value = not option_existing_value
+
+				setattr(pokemon_options, option_name, option_new_value)
+			except AttributeError:
+				response['status'] = "error"
+				response['msg'] = "This option " + option_name + " doesn't exist!"
+				return JsonResponse(response)
+
+		pokemon_options.save();
+
+		print(connection.queries)
+
+		response['status'] = "ok"
+
+		return JsonResponse(response)
+
+
+def pokemon_options_POST(request, pokemon_number):
 	response = {
 		"status": "pending"
 	}

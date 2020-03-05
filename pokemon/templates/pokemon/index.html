@@ -3,39 +3,27 @@
 {% block content %}
 
 {% if user.is_authenticated %}
-<script type="text/javascript">var ajax_csrf_token = "{{ csrf_token }}";</script>
-{% endif %}
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Pokemon name</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			</div>
-			<div class="modal-body">
-				<form>
-					<div class="form-group form-check">
-						<div class="">
-							<input class="form-check-input" type="checkbox" id="gridCheck1">
-							<label class="form-check-label" for="gridCheck1">Owned ?</label>
-						</div>
-					</div>
-					<div class="form-group form-check">
-						<div class="">
-							<input class="form-check-input" type="checkbox" id="gridCheck1">
-							<label class="form-check-label" for="gridCheck1">Owned ?</label>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary">Save changes</button>
+	<script type="text/javascript">var ajax_csrf_token = "{{ csrf_token }}";</script>
+
+	<!-- Modal -->
+	<div class="modal fade" id="pokemon-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Pokemon name</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				</div>
+				<div class="modal-body">
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary btn-save">Save changes</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+{% endif %}
 
 <div class="container-fluid main-pokemons-list">
 	<h1 class="mt-4">Dashboard</h1>
@@ -64,19 +52,17 @@
 					</thead>
 					<tbody>
 						{% for pokemon in pokemons %}
-							<tr>
+							<tr class="container-pokemon-{{ pokemon.number }}">
 								<td>{{ pokemon.number }}</td>
 								<td class="sprite"><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
 								<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.name }}</a></td>
 								{% if user.is_authenticated %}
 									<td class="actions">
 										{% if pokemon.is_owned is not True %}
-											<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-check"></i> Mark as Owned</button>
+											<button type="button" class="btn btn-primary btn-mark-owned" onclick="return pokemon_change_option('{{ pokemon.number}}', 'owned');"><i class="fas fa-check"></i> Mark as Owned</button>
 										{% endif %}
 
-										{% if pokemon.is_owned is True %}
-											<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Options</button>
-										{% endif %}
+										<button style="{% if not pokemon.is_owned is True %}display:none{% endif %}" onclick="return pokemon_show_modal('{{ pokemon.number }}');" type="button" class="btn-options btn btn-primary">Options</button>
 									</td>
 								{% endif %}
 							</tr>

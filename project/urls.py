@@ -16,7 +16,7 @@ urlpatterns = [
 	path('dashboard/', pokemon_views.index, name='user_dashboard'),
 	path('dashboard/profile/', base_views.user_profile, name='user_profile'),
 
-	path('pokemon/<str:pokemon_number>/toggle', pokemon_views.pokemon_toggle, name='pokemon_toggle'),
+	path('pokemon/<str:pokemon_number>/options', pokemon_views.pokemon_options, name='pokemon_options'),
 	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_detail, name='pokemon_detail'),
 	path('import', pokemon_views.import_pokemon, name='import'),
 	url(r'^oauth/', include('social_django.urls', namespace='social')),
