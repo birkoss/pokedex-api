@@ -2,41 +2,94 @@ body {
 	background-color: #f4f4f4;
 }
 
-main > .card {
-	padding: 40px;
+nav.navbar {
+	background-color: #dc0a2d !important;
 }
 
-main > .card > table.table {
-	margin-bottom: 0;
+nav.sb-sidenav.sb-sidenav-dark {
+	background-color: #376092 !important;
 }
 
-.pokemon-image {
-    background-image: url(../sprites/pokemons.png);
-    background-repeat: no-repeat;
+nav.sb-sidenav.sb-sidenav-dark .sb-sidenav-footer {
+	background-color: #dc0a2d !important;
 }
 
-table.pokemons-list td {
-	vertical-align: middle !important;
+nav.sb-sidenav.sb-sidenav-dark {
+	color: rgba(255, 255, 255, 0.75);
 }
+
+nav.sb-sidenav.sb-sidenav-dark .sb-sidenav-menu .sb-sidenav-menu-heading {
+	color: rgba(255, 255, 255, 0.50);
+}
+
+nav.sb-sidenav.sb-sidenav-dark .sb-sidenav-menu .nav-link {
+	color: rgba(255, 255, 255, 0.75);
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #dc0a2d;
+    border-color: #dc0a2d;
+}
+
+.btn-primary:hover {
+	background-color: #376092 !important;
+}
+
+/* Homepage Pokemons Grid */
 
 .pokemons-grid {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
 }
 
-/* This is used to prevent the last row, with missing items to be out of the normal grid */
-.pokemons-grid:after {
-	content: "";
-	flex: auto;
+.pokemons-grid > .card.pokemon {
+	width: 180px;
+	margin: 10px;
 }
 
-a.pokemon-sprite:before {
-	background-image: url(../sprites/pokemons.png);
-	background-repeat: no-repeat;
-	content: " ";
-	display: block;
+.pokemons-grid > .card.pokemon > a.pokemon-sprite {
+	display: flex;
+	justify-content: center;
 }
+
+.pokemons-grid > .card.pokemon > .card-body {
+	background-color: #fafafa;
+	text-align: center;
+	position: relative;
+    padding: .75rem 1.25rem;
+}
+
+.pokemons-grid > .card.pokemon > .card-body .pokemon_number {
+	position: absolute;
+    top: -28px;
+    left: 10px;
+    color: #ccc;
+}
+
+.pokemons-grid > .card.pokemon > .card-body h5 {
+	font-size: 1rem;
+}
+
+@media screen and (max-width: 990px) {
+	.pokemons-grid {
+		justify-content: space-evenly;
+	}
+}
+
+@media screen and (max-width: 450px) {
+	.pokemons-grid > .card.pokemon {
+    	width: calc(50% - 20px);
+    }
+}
+
+@media screen and (max-width: 320px) {
+	.pokemons-grid > .card.pokemon {
+    	width: calc(80% - 20px);
+    }
+}
+
+/* User Profile */
 
 .user-profile .social-media:not(:first-child) {
 	margin-top: 20px;
@@ -44,32 +97,20 @@ a.pokemon-sprite:before {
 	padding-top: 20px;
 }
 
-.actions a {
-	font-size: 24px;
+/* Pokemons sprites */
+
+a.pokemon-sprite:before {
+	background-image: url(../sprites/pokemons.png);
+	background-repeat: no-repeat;
+	content: " ";
+	display: block;
+
+    /*transform: scale(2);
+	image-rendering: pixelated;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: crisp-edges;*/
 }
 
-@media screen and (max-width: 600px) {
-	.main-pokemons-list .card-header {
-		display: none;
-	}
-	table.pokemons-list thead {
-		display: none;
-	}
-	table.pokemons-list tbody {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-	}
-	table.pokemons-list tbody tr {
-		display: flex;
-	}
-
-	table.pokemons-list tbody tr > td {
-		display: none;
-	}
-	table.pokemons-list tbody tr > td.sprite {
-		display: block;
-		padding: 0;
-		border: 0;
-	}
+body.logged-in a.pokemon-sprite:not(.is-owned):before {
+	opacity: 0.2;
 }

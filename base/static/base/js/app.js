@@ -1,15 +1,53 @@
-// Call the dataTables jQuery plugin
 jQuery(document).ready(function() {
-	jQuery('body.logged-in #pokemons-list').DataTable();
 
-	jQuery('body:not(.logged-in) table.pokemons-list tbody').infiniteScroll({
-		path: '.pagination-next',
-		append: 'table.pokemons-list tbody tr',
-		//history: 'push',
-		hideNav: '.pagination',
-		status: '.page-load-status'
+	jQuery("#pokemon-modal .btn-save").click(function() {
+		/* Do NOT allow saving while it's already in process */
+		if (jQuery("#pokemon-modal .btn-save").prop("disabled")) {
+			return;
+		}
+		jQuery("#pokemon-modal .btn-save").prop("disabled", true).html("Saving...");
+
+		/* Fetch all options from the modal */
+		var options = {};
+		jQuery("#pokemon-modal input[type='checkbox']").each(function() {
+			options[ jQuery(this).attr("id") ] = jQuery(this).prop("checked");
+		});
+
+		var pokemon_number = jQuery("#pokemon-modal input[name='pokemon_number']").val();
+
+		/* Update all options for this pokemon */
+		pokemon_toggle_options(pokemon_number, options, function(ret) {
+			jQuery("#pokemon-modal .btn-save").prop("disabled", false).html("Save");
+			jQuery('#pokemon-modal').modal('hide');
+
+			if (options['is_owned'] != undefined) {
+				if (options['is_owned']) {
+					jQuery(".container-pokemon-" + pokemon_number + " a.pokemon-sprite").addClass("is-owned");
+				} else {
+					jQuery(".container-pokemon-" + pokemon_number + " a.pokemon-sprite").removeClass("is-owned");
+				}
+			}
+		});
 	});
 
+	jQuery.ajax({
+		'type': "GET",
+		'url': "pokemons/cards/1",
+		'data': {
+			
+		},
+		success: function(ret) {
+			jQuery(".pokemons-grid").html(ret);
+
+			jQuery('.pokemons-grid').infiniteScroll({
+				path: '.pagination-next',
+				append: '.card.pokemon',
+				//history: 'push',
+				hideNav: '.pagination',
+				status: '.page-load-status'
+			});
+		}
+	});
 });
 
 function pokemon_change_option(pokemon_number, option_name) {
@@ -30,21 +68,6 @@ function pokemon_change_option(pokemon_number, option_name) {
 function pokemon_show_modal(pokemon_number) {
 	jQuery('#pokemon-modal .modal-body').load('/pokemon/' + pokemon_number + '/options', function() {
 		jQuery('#pokemon-modal').modal({show:true});
-		jQuery("#pokemon-modal .btn-save").click(function() {
-			if (jQuery("#pokemon-modal .btn-save").prop("disabled")) {
-				return;
-			}
-			jQuery("#pokemon-modal .btn-save").prop("disabled", true).html("Saving...");
-			var options = {};
-			jQuery("#pokemon-modal input[type='checkbox']").each(function() {
-				options[ jQuery(this).attr("id") ] = jQuery(this).prop("checked");
-			});
-
-			pokemon_toggle_options(pokemon_number, options, function(ret) {
-				jQuery("#pokemon-modal .btn-save").prop("disabled", false).html("Save");
-				jQuery('#pokemon-modal').modal('hide')
-			});
-		});
 	});
 }
 

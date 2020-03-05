@@ -5,7 +5,6 @@
 {% if user.is_authenticated %}
 	<script type="text/javascript">var ajax_csrf_token = "{{ csrf_token }}";</script>
 
-	<!-- Modal -->
 	<div class="modal fade" id="pokemon-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
@@ -26,99 +25,43 @@
 {% endif %}
 
 <div class="container-fluid main-pokemons-list">
-	<h1 class="mt-4">Dashboard</h1>
-	<div class="card mb-4">
-		<div class="card-header"><i class="fas fa-table mr-1"></i>{{ pokemons.count }} Pokemons</div>
-		<div class="card-body">
+	<h1 class="mt-4">Pokedex</h1>
 
-		{% if mode == 'grid' %}
-			<div class="pokemons-grid">
-				{% for pokemon in pokemons %}
-					<div class="pokemon"><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></div>
-				{% endfor %}
-			</div>
-		{% else %}
-			<div class="table-responsive">
-				<table class="table table-bordered pokemons-list" id="pokemons-list" width="100%" cellspacing="0">
-					<thead>
-						<tr>
-							<th width="30">#</th>
-							<th>&nbsp;</th>
-							<th>Name</th>
-							{% if user.is_authenticated %}
-								<th>Actions</th>
-							{% endif %}
-						</tr>
-					</thead>
-					<tbody>
-						{% for pokemon in pokemons %}
-							<tr class="container-pokemon-{{ pokemon.number }}">
-								<td>{{ pokemon.number }}</td>
-								<td class="sprite"><a href="{% url 'pokemon_detail' pokemon.number %}" class="pokemon-sprite pokemon-{{ pokemon.number }}"></a></td>
-								<td><a href="{% url 'pokemon_detail' pokemon.number %}">{{ pokemon.name }}</a></td>
-								{% if user.is_authenticated %}
-									<td class="actions">
-										{% if pokemon.is_owned is not True %}
-											<button type="button" class="btn btn-primary btn-mark-owned" onclick="return pokemon_change_option('{{ pokemon.number}}', 'is_owned');"><i class="fas fa-check"></i> Mark as Owned</button>
-										{% endif %}
-
-										<button style="{% if not pokemon.is_owned is True %}display:none{% endif %}" onclick="return pokemon_show_modal('{{ pokemon.number }}');" type="button" class="btn-options btn btn-primary">Options</button>
-									</td>
-								{% endif %}
-							</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-
-
-			{% if not user.is_authenticated and paginator.has_other_pages %}
-				<ul class="pagination">
-					{% if paginator.has_previous %}
-						<li class="page-item"><a class="page-link" href="{% url 'pokemon_list_page' paginator.previous_page_number %}">&laquo;</a></li>
-					{% else %}
-						<li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-					{% endif %}
-
-					{% for i in paginator.paginator.page_range %}
-						{% if paginator.number == i %}
-							<li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
-						{% elif i == 0 %}
-							<li class="page-item"><a class="page-link" href="{% url 'pokemon_list' %}">{{ i }}</a></li>
-						{% else %}
-							<li class="page-item"><a class="page-link" href="{% url 'pokemon_list_page' i %}">{{ i }}</a></li>
-						{% endif %}
-					{% endfor %}
-
-					{% if paginator.has_next %}
-						<li class="page-item"><a class="page-link pagination-next" href="{% url 'pokemon_list_page' paginator.next_page_number %}">&raquo;</a></li>
-					{% else %}
-						<li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-					{% endif %}
-				</ul>
-
-				<div class="page-load-status">
-					<p class="infinite-scroll-request">
-						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-							<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
-								<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
-							</circle>
-							<circle cx="40.3735" cy="50" fill="#4c4b49" r="20">
-								<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="0s"></animate>
-							</circle>
-							<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
-								<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
-							<animate attributeName="fill-opacity" values="0;0;1;1" calcMode="discrete" keyTimes="0;0.499;0.5;1" dur="1s" repeatCount="indefinite"></animate>
-							</circle>
-						</svg>
-					</p>
-					<p class="infinite-scroll-last">End of content</p>
-					<p class="infinite-scroll-error">No more pages to load</p>
-				</div>
-			{% endif %}
-
-		{% endif %}
-		</div>
+	<div class="pokemons-grid">
+		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+			<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
+				<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
+			</circle>
+			<circle cx="40.3735" cy="50" fill="#4c4b49" r="20">
+				<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="0s"></animate>
+			</circle>
+			<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
+				<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
+			<animate attributeName="fill-opacity" values="0;0;1;1" calcMode="discrete" keyTimes="0;0.499;0.5;1" dur="1s" repeatCount="indefinite"></animate>
+			</circle>
+		</svg>
 	</div>
+
+	{% if not user.is_authenticated and paginator.has_other_pages %}
+		<div class="page-load-status">
+			<p class="infinite-scroll-request">
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+					<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
+						<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
+					</circle>
+					<circle cx="40.3735" cy="50" fill="#4c4b49" r="20">
+						<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="0s"></animate>
+					</circle>
+					<circle cx="59.6265" cy="50" fill="#e83a38" r="20">
+						<animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="-0.5s"></animate>
+					<animate attributeName="fill-opacity" values="0;0;1;1" calcMode="discrete" keyTimes="0;0.499;0.5;1" dur="1s" repeatCount="indefinite"></animate>
+					</circle>
+				</svg>
+			</p>
+			<p class="infinite-scroll-last">End of content</p>
+			<p class="infinite-scroll-error">No more pages to load</p>
+		</div>
+	{% endif %}
+
 </div>
 {% endblock %}

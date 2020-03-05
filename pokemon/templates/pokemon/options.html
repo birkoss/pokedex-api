@@ -1,5 +1,5 @@
-{{ options.is_owned }} - {{ options.is_shiny }}
 <form class="pokemon-options">
+	<input type="hidden" name="pokemon_number" value="{{ pokemon.number }}" />
 	<div class="form-group form-check">
 		<div class="">
 			<input class="form-check-input" type="checkbox" id="is_owned" {% if options.is_owned %}checked="checked" {% endif %}/>

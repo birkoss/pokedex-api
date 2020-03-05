@@ -1,0 +1,15 @@
+{% for pokemon in pokemons %}
+	<div class="card pokemon container-pokemon-{{ pokemon.number }}">
+		<a href="{% url 'pokemon_detail' pokemon.number %}" class="card-img-top pokemon-sprite pokemon-{{ pokemon.number }}{% if is_logged and pokemon.is_owned %} is-owned{% endif %}"></a>
+		<div class="card-body">
+			<p class="pokemon_number">{{ pokemon.number }}</p>
+			<h5>{{ pokemon.name }}</h5>
+			{% if is_logged %}
+				<a href="#" onclick="return pokemon_show_modal('{{ pokemon.number }}');" class="btn btn-primary"><i class="fas fa-cogs"></i></a>
+				<a href="{% url 'pokemon_detail' pokemon.number %}" class="btn btn-primary"><i class="fas fa-angle-double-right"></i></a>
+			{% else %}
+				<a href="{% url 'pokemon_detail' pokemon.number %}" class="btn btn-primary"><i class="fas fa-angle-double-right"></i></a>
+			{% endif %}
+		</div>
+	</div>
+{% endfor %}	
