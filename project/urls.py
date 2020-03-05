@@ -12,16 +12,20 @@ handler404 = 'base.views.error_404'
 urlpatterns = [
 	path('admin/', admin.site.urls),
 
+	# Archive Pokemon
 	path('', pokemon_views.index, name='pokemon_list'),
+
+	path('page/<int:page>', pokemon_views.pokemons_cards, name='pokemon_page'),
+
+	# Single Pokemon page
+	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_detail, name='pokemon_detail'),
+
+	# Single Pokemon Options (for the modal) 
+	path('pokemon/<str:pokemon_number>/options', pokemon_views.pokemon_options, name='pokemon_options'),
 	
 	path('logout/', base_views.user_logout, name='logout'),
 	path('profile', base_views.user_profile, name='user_profile'),
 
-	path('pokemons/cards/<int:page>', pokemon_views.pokemons_cards, name='pokemons_cards'),
-	path('pokemons/options', pokemon_views.pokemons_options, name='pokemons_options'),
-
-	path('pokemon/<str:pokemon_number>/options', pokemon_views.pokemon_options, name='pokemon_options'),
-	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_detail, name='pokemon_detail'),
 	
 	path('import', pokemon_views.import_pokemon, name='import'),
 	

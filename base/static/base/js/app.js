@@ -32,7 +32,7 @@ jQuery(document).ready(function() {
 
 	jQuery.ajax({
 		'type': "GET",
-		'url': "pokemons/cards/1",
+		'url': ajax_first_page,
 		'data': {
 			
 		},
@@ -66,7 +66,7 @@ function pokemon_change_option(pokemon_number, option_name) {
 }
 
 function pokemon_show_modal(pokemon_number) {
-	jQuery('#pokemon-modal .modal-body').load('/pokemon/' + pokemon_number + '/options', function() {
+	jQuery('#pokemon-modal .modal-body').load(ajax_single_option.replace("0000", pokemon_number), function() {
 		jQuery('#pokemon-modal').modal({show:true});
 	});
 }
@@ -74,7 +74,7 @@ function pokemon_show_modal(pokemon_number) {
 function pokemon_toggle_options(pokemon_number, options, callback) {
 	jQuery.ajax({
 		type: "POST",
-		url: "/pokemon/" + pokemon_number + "/options",
+		url: ajax_single_option.replace("0000", pokemon_number),
 		data: {
 			"options": JSON.stringify(options),
 			"csrfmiddlewaretoken": ajax_csrf_token

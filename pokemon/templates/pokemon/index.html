@@ -2,8 +2,15 @@
 
 {% block content %}
 
+<script type="text/javascript">
+	var ajax_first_page = "{% url 'pokemon_page' 1 %}";
+	var ajax_single_option = "{% url 'pokemon_options' "0000" %}";
+</script>
+
 {% if user.is_authenticated %}
-	<script type="text/javascript">var ajax_csrf_token = "{{ csrf_token }}";</script>
+	<script type="text/javascript">
+		var ajax_csrf_token = "{{ csrf_token }}";
+	</script>
 
 	<div class="modal fade" id="pokemon-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
