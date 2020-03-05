@@ -20,6 +20,8 @@ def pokemon_options(request, pokemon_number):
 
 		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
 
+		print(pokemon_options)
+
 		return render(request, "pokemon/options.html", {
 			'pokemon': pokemon,
 			'options': pokemon_options
@@ -86,88 +88,6 @@ def pokemon_options(request, pokemon_number):
 		response['status'] = "ok"
 
 		return JsonResponse(response)
-
-
-def pokemon_options_POST(request, pokemon_number):
-	response = {
-		"status": "pending"
-	}
-
-	option_name = request.POST.get("option", "")
-	if option_name == "":
-		response['status'] = "error"
-		response['msg'] = "You must specific an option!"
-		return JsonResponse(response)
-
-	if not request.user.is_authenticated:
-		response['status'] = "error"
-		response['msg'] = "You must be logged in!"
-		return JsonResponse(response)
-
-	pokemon = Pokemon.objects.filter(number=pokemon_number).first()
-	if pokemon is None:
-		response['status'] = "error"
-		response['msg'] = "This pokemon doesn't exist!"
-		return JsonResponse(response)
-
-	user_pokemon = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
-	if user_pokemon is None:
-		user_pokemon = UserPokemon(pokemon=pokemon, user=request.user)
-		user_pokemon.save()
-
-	try:
-		setattr(user_pokemon, "is_" + option_name, not getattr(user_pokemon, "is_" + option_name))
-	except AttributeError:
-		response['status'] = "error"
-		response['msg'] = "This option doesn't exist!"
-		return JsonResponse(response)
-
-	user_pokemon.save();
-
-	response['status'] = "ok"
-
-	return JsonResponse(response)
-
-
-def test(request):
-	pokemons_qs = Pokemon.objects.annotate(
-		t=FilteredRelation(
-			'userpokemon', condition=(Q(userpokemon__user=request.user) | Q(userpokemon__isnull=True))
-		)
-	).filter(
-		
-	).values(
-		"name", "number", "t__is_owned", "t__is_shiny"
-	)
-
-	print(pokemons_qs.query)
-
-#	pokemons_qs = Pokemon.objects.filter(
-#		Q(userpokemon__user=request.user) | Q(userpokemon__isnull=True)
-#	).values(
-#		"name", "number", "userpokemon__is_owned", "userpokemon__is_shiny"
-#	)
-	page = 1
-
-	paginator = Paginator(pokemons_qs, 5)
-	try:
-		pokemons_list = paginator.page(page)
-	except PageNotAnInteger:
-		pokemons_list = paginator.page(1)
-	except EmptyPage:
-		pokemons_list = paginator.page(paginator.num_pages)
-
-	pokemons = []
-	for single_pokemon in pokemons_list:
-		pokemons.append({
-			'name': single_pokemon['name'],
-			'is_owned': single_pokemon['t__is_owned'],
-			'is_shiny': single_pokemon['t__is_shiny'],
-		})
-
-	return render(request, "pokemon/test.html", {
-		'pokemons': pokemons
-	})
 
 
 def index(request, page=1):

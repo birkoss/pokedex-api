@@ -9,7 +9,6 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 
 	path('', pokemon_views.index, name='pokemon_list'),
-	path('test', pokemon_views.test, name='pokemon_test'),
 	path('<int:page>/', pokemon_views.index, name='pokemon_list_page'),
 	
 	path('logout/', base_views.user_logout, name='logout'),

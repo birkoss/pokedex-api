@@ -28,16 +28,21 @@ function pokemon_change_option(pokemon_number, option_name) {
 }
 
 function pokemon_show_modal(pokemon_number) {
-	jQuery('#pokemon-modal .modal-body').load('/pokemon/002/options',function(){
+	jQuery('#pokemon-modal .modal-body').load('/pokemon/' + pokemon_number + '/options', function() {
 		jQuery('#pokemon-modal').modal({show:true});
 		jQuery("#pokemon-modal .btn-save").click(function() {
+			if (jQuery("#pokemon-modal .btn-save").prop("disabled")) {
+				return;
+			}
+			jQuery("#pokemon-modal .btn-save").prop("disabled", true).html("Saving...");
 			var options = {};
 			jQuery("#pokemon-modal input[type='checkbox']").each(function() {
 				options[ jQuery(this).attr("id") ] = jQuery(this).prop("checked");
 			});
 
 			pokemon_toggle_options(pokemon_number, options, function(ret) {
-				console.log(ret);
+				jQuery("#pokemon-modal .btn-save").prop("disabled", false).html("Save");
+				jQuery('#pokemon-modal').modal('hide')
 			});
 		});
 	});
@@ -52,11 +57,9 @@ function pokemon_toggle_options(pokemon_number, options, callback) {
 			"csrfmiddlewaretoken": ajax_csrf_token
 		},
 		success: function(ret) {
-			if (ret['status'] == "ok") {
-				jQuery(".container-pokemon-" + pokemon_number + " td.actions svg").remove();
-				jQuery(".container-pokemon-" + pokemon_number + " td.actions > .btn-options").show();
+			if (callback != undefined) {
+				callback(ret);
 			}
-
 		}
 	});
 }
