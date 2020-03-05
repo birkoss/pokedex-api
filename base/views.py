@@ -1,8 +1,13 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from social_django.models import UserSocialAuth
+
+
+def error_404(request, exception=None):
+	return render(request, 'base/404.html')
 
 
 @login_required
