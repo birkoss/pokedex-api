@@ -3,8 +3,8 @@
 {% block content %}
 
 <script type="text/javascript">
-	var ajax_first_page = "{% url 'pokemon_page' 1 %}";
-	var ajax_single_option = "{% url 'pokemon_options' "0000" %}";
+	var ajax_first_page = "{% url 'pokemon_archive_page' 1 %}";
+	var ajax_single_option = "{% url 'pokemon_single_options' "0000" %}";
 </script>
 
 {% if user.is_authenticated %}

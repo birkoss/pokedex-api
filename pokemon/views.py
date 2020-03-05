@@ -17,6 +17,11 @@ from pokemon.models import Pokemon, Generation, UserPokemon
 @login_required
 def pokemon_options(request, pokemon_number):
 	if request.method == "GET":
+		request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
+
+		if request_header_requested_with != "XMLHttpRequest":
+			return redirect('pokemon_archive')
+
 		pokemon = Pokemon.objects.filter(number=pokemon_number).first()
 
 		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
@@ -155,7 +160,7 @@ def pokemons_cards(request, page=1):
 	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
 
 	if request_header_requested_with != "XMLHttpRequest":
-		return redirect('pokemon_list')
+		return redirect('pokemon_archive')
 
 	pokemons_data = pokemons_detail(request.user, page)
 
