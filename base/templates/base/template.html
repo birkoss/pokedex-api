@@ -11,9 +11,7 @@
 		<link rel="icon" href="{% static 'base/favicon.ico' %}" />
 
 		{% compress css %}
-			<link href="{% static 'base/css/bootstrap.css' %}" rel="stylesheet" async />
 			<link href="{% static 'base/css/app.css' %}" rel="stylesheet" async />
-			<link href="{% static 'base/css/pokemon.css' %}" rel="stylesheet" async />
 		{% endcompress %}
 	</head>
 
@@ -53,6 +51,11 @@
 		</nav>
 
 		{% block base %}{% endblock %}
+
+		{% compress css %}
+			<link href="{% static 'base/css/bootstrap.css' %}" rel="stylesheet" async />
+			<link href="{% static 'base/css/pokemon.css' %}" rel="stylesheet" async />
+		{% endcompress %}
 
 		{% compress js %}
 			<script src="{% static 'base/js/jquery.js' %}"></script>
