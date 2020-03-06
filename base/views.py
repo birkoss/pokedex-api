@@ -14,7 +14,7 @@ def error_404(request, exception=None):
 def user_logout(request):
 	logout(request)
 
-	return redirect('pokemon_list')
+	return redirect('pokemon_archive')
 
 
 @login_required

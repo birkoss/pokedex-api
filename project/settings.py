@@ -75,8 +75,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-LOGIN_REDIRECT_URL = 'pokemon_list'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'pokemon_list'
+LOGIN_REDIRECT_URL = 'pokemon_archive'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'pokemon_archive'
 
 
 LANGUAGE_CODE = 'en-us'
