@@ -147,3 +147,9 @@ body.logged-in a.pokemon-sprite:not(.is-owned):before {
 .error div.card-body {
 	text-align: center;
 }
+
+/* Single */
+
+.card.pokemon-names .card-body p:last-child {
+	margin: 0;
+}

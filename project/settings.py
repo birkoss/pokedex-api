@@ -74,7 +74,9 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-
+# @TODO: Use a proper login URL (similar to the login dropdown)
+LOGIN_URL = 'pokemon_archive'
+LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'pokemon_archive'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'pokemon_archive'
 

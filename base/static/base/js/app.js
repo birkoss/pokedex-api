@@ -1,11 +1,5 @@
 jQuery(document).ready(function() {
 
-	jQuery('.toast').toast({
-		animation: true,
-		autohide: true,
-		delay: 2000
-	});
-
 	jQuery("#pokemon-modal .btn-save").click(function() {
 		/* Do NOT allow saving while it's already in process */
 		if (jQuery("#pokemon-modal .btn-save").prop("disabled")) {
@@ -26,13 +20,6 @@ jQuery(document).ready(function() {
 			jQuery("#pokemon-modal .btn-save").prop("disabled", false).html("Save");
 			jQuery('#pokemon-modal').modal('hide');
 
-			console.log("toast..");
-			/*
-
-			jQuery('.toast').toast('show');
-			*/
-			jQuery('.toast').toast('show');
-
 			if (options['is_owned'] != undefined) {
 				if (options['is_owned']) {
 					jQuery(".container-pokemon-" + pokemon_number + " a.pokemon-sprite").addClass("is-owned");
@@ -48,7 +35,7 @@ jQuery(document).ready(function() {
 			'type': "GET",
 			'url': ajax_first_page,
 			'data': {
-				
+				"type": ajax_pokemon_type
 			},
 			success: function(ret) {
 				jQuery(".pokemons-grid").html(ret);
@@ -57,6 +44,7 @@ jQuery(document).ready(function() {
 					path: '.pagination-next',
 					append: '.card.pokemon',
 					//history: 'push',
+					history: 'none',
 					hideNav: '.pagination',
 					status: '.page-load-status'
 				});
@@ -91,6 +79,22 @@ function pokemon_show_modal(pokemon_number) {
 }
 
 function pokemon_toggle_options(pokemon_number, options, callback) {
+	jQuery.ajax({
+		type: "POST",
+		url: ajax_single_option.replace("0000", pokemon_number),
+		data: {
+			"options": JSON.stringify(options),
+			"csrfmiddlewaretoken": ajax_csrf_token
+		},
+		success: function(ret) {
+			if (callback != undefined) {
+				callback(ret);
+			}
+		}
+	});
+}
+
+function set_options(type, value) {
 	jQuery.ajax({
 		type: "POST",
 		url: ajax_single_option.replace("0000", pokemon_number),

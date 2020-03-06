@@ -96,38 +96,23 @@ def pokemon_options(request, pokemon_number):
 		return JsonResponse(response)
 
 
-def pokemons_options(request):
-	pokemons_list = Pokemon.objects.annotate(
-		t=FilteredRelation(
-			'userpokemon', condition=(Q(userpokemon__user=request.user) | Q(userpokemon__isnull=True))
-		)
-	).filter(
-		
-	).values(
-		"name", "number", "t__is_owned", "t__is_shiny"
-	)
-
-	pokemons = []
-	for single_pokemon in pokemons_list:
-		pokemon = {
-			'name': single_pokemon['name'],
-			'number': single_pokemon['number']
-		}
-
-		pokemons.append(pokemon)
-
-	return JsonResponse({'data': pokemons})
-
-
 def index(request):
-	return render(request, "pokemon/index.html")
+	return render(request, "pokemon/archive.html", {
+		"type": "pokemons"
+	})
+
+
+def pokemons_forms_archive(request):
+	return render(request, "pokemon/archive.html", {
+		"type": "forms"
+	})
 
 
 # @TODO : Merge pokemons_cards with pokemon_detail
-def pokemon_detail(request, pokemon_number=None):
+def pokemon_single(request, pokemon_number=None):
 	pokemon = get_object_or_404(Pokemon, number=pokemon_number)
 
-	return render(request, "pokemon/detail.html", {'pokemon': pokemon})
+	return render(request, "pokemon/single.html", {'pokemon': pokemon})
 
 
 def import_pokemon(request):
@@ -153,6 +138,19 @@ def import_pokemon(request):
 				pokemon = Pokemon(**data)
 				pokemon.save()
 
+		for single_pokemon in data['forms']:
+			pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
+			if len(pokemon) == 0:
+				data = {}
+				data['number'] = single_pokemon['number']
+				data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
+				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
+					if mlid in single_pokemon:
+						data[mlid.replace("s/", "_")] = single_pokemon[mlid]
+				pokemon = Pokemon(**data)
+				pokemon.save();
+
+
 	return HttpResponse("<p>test2</p>")
 
 
@@ -162,7 +160,9 @@ def pokemons_cards(request, page=1):
 	if request_header_requested_with != "XMLHttpRequest":
 		return redirect('pokemon_archive')
 
-	pokemons_data = pokemons_detail(request.user, page)
+	pokemon_type = request.GET.get("type", "pokemons")
+
+	pokemons_data = pokemons_detail(request.user, page, pokemon_type)
 
 	content_format = request.GET.get("format", "html")
 
@@ -183,14 +183,24 @@ def pokemons_cards(request, page=1):
 	return HttpResponse(content['cards'] + content['pagination'])
 
 
-def pokemons_detail(user, page):
+def pokemons_detail(user, page, pokemon_type):
+
+	pagination = 40
+
+	filters = {}
+	if pokemon_type == "pokemons":
+		filters['variant__isnull'] = True
+	else:
+		pagination = 200
+		filters['variant__isnull'] = False
+
 	if user.is_authenticated:
 		pokemons_qs = Pokemon.objects.annotate(
 			t=FilteredRelation(
 				'userpokemon', condition=(Q(userpokemon__user=user) | Q(userpokemon__isnull=True))
 			)
 		).filter(
-			
+			**filters
 		).values(
 			"name", "number", "t__is_owned", "t__is_shiny"
 		)
@@ -199,7 +209,9 @@ def pokemons_detail(user, page):
 			"name", "number"
 		)
 
-	paginator = Paginator(pokemons_qs, 40)
+	print(pokemon_type)
+
+	paginator = Paginator(pokemons_qs, pagination)
 
 	try:
 		pokemons_paginator = paginator.page(page)
@@ -207,7 +219,8 @@ def pokemons_detail(user, page):
 		pokemons_paginator = paginator.page(1)
 	except EmptyPage:
 		pokemons_paginator = paginator.page(paginator.num_pages)
-	
+
+
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
 		pokemon = {
@@ -221,6 +234,7 @@ def pokemons_detail(user, page):
 			pokemon['is_owned'] = single_pokemon['t__is_owned']
 			pokemon['is_shiny'] = single_pokemon['t__is_shiny']
 
+		print(pokemon)
 		pokemons_list.append(pokemon)
 
 	return {
