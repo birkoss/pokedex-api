@@ -201,15 +201,15 @@ def pokemons_detail(user, page, pokemon_type):
 			)
 		).filter(
 			**filters
-		).values(
-			"name", "number", "t__is_owned", "t__is_shiny"
+		).select_related('variant').values(
+			"name", "number", "t__is_owned", "t__is_shiny", "variant__name"
 		)
 	else:
-		pokemons_qs = Pokemon.objects.all().values(
-			"name", "number"
+		pokemons_qs = Pokemon.objects.all().filter(
+			**filters
+		).values(
+			"name", "number", "variant__name"
 		)
-
-	print(pokemon_type)
 
 	paginator = Paginator(pokemons_qs, pagination)
 
@@ -226,15 +226,18 @@ def pokemons_detail(user, page, pokemon_type):
 		pokemon = {
 			'name': single_pokemon['name'],
 			'number': single_pokemon['number'],
+			'visible_number': single_pokemon['number'][:3],
 			'is_owned': None,
 			'is_shiny': None,
 		}
+
+		if single_pokemon['variant__name'] != None:
+			pokemon['name'] = single_pokemon['variant__name'] + " " + pokemon['name']
 
 		if user.is_authenticated:
 			pokemon['is_owned'] = single_pokemon['t__is_owned']
 			pokemon['is_shiny'] = single_pokemon['t__is_shiny']
 
-		print(pokemon)
 		pokemons_list.append(pokemon)
 
 	return {

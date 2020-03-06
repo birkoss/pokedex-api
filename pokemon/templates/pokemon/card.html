@@ -2,7 +2,7 @@
 	<div class="card pokemon container-pokemon-{{ pokemon.number }}">
 		<a href="{% url 'pokemon_single' pokemon.number %}" class="card-img-top pokemon-sprite pokemon-{{ pokemon.number }}{% if is_logged and pokemon.is_owned %} is-owned{% endif %}"></a>
 		<div class="card-body">
-			<p class="pokemon_number">{{ pokemon.number }}</p>
+			<p class="pokemon_number">{{ pokemon.visible_number }}</p>
 			<h5>{{ pokemon.name }}</h5>
 			{% if is_logged %}
 				<a href="#" onclick="return pokemon_show_modal('{{ pokemon.number }}');" class="btn btn-primary"><i class="fas fa-cogs"></i></a>
