@@ -63,6 +63,10 @@ nav.sb-sidenav.sb-sidenav-dark .sb-sidenav-menu .nav-link {
 	border-color: #cccccc !important;
 }
 
+a.nav-link.active {
+	text-decoration: underline;
+}
+
 /* Homepage Pokemons Grid */
 
 .pokemons-grid {

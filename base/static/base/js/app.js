@@ -1,21 +1,22 @@
 /* Use to keep the existing Modal Options when it's first open */
-var original_modal_options = {};
+var ORIGINAL_MODAL_OPTIONS = {};
+var POKEMON_FILTERS = ["is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender"];
 
 
 /* Load the options for this pokemon and show the modal */
 function pokemon_show_modal(pokemon_number) {
-	jQuery('#pokemon-modal .modal-body').load(ajax_single_option.replace("0000", pokemon_number), function() {
+	jQuery('#pokemon-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
 		jQuery('#pokemon-modal').modal({show:true});
 		jQuery('[data-toggle="tooltip"]').tooltip();
 		jQuery("#pokemon-modal .btn-save").prop("disabled", true);
 
-		original_modal_options = JSON.stringify(get_modal_options());
+		ORIGINAL_MODAL_OPTIONS = JSON.stringify(get_modal_options());
 
 		/* Activate/Disable the SAVE button when options are changed */
 		jQuery("#pokemon-modal input[type='checkbox']").change(function() {
 			var current_modal_options = JSON.stringify(get_modal_options());
 
-			jQuery("#pokemon-modal .btn-save").prop("disabled", (original_modal_options == current_modal_options));
+			jQuery("#pokemon-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
 		});
 	});
 
@@ -27,10 +28,10 @@ function pokemon_show_modal(pokemon_number) {
 function pokemon_save_options(pokemon_number, options, callback) {
 	jQuery.ajax({
 		type: "POST",
-		url: ajax_single_option.replace("0000", pokemon_number),
+		url: AJAX_SINGLE_OPTION.replace("0000", pokemon_number),
 		data: {
 			"options": JSON.stringify(options),
-			"csrfmiddlewaretoken": ajax_csrf_token
+			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
 		},
 		success: function(ret) {
 			if (callback != undefined) {
@@ -44,11 +45,9 @@ function pokemon_save_options(pokemon_number, options, callback) {
 /* Get all the options (name and value) from the modal */
 function get_modal_options() {
 	modal_options = {};
-
 	jQuery("#pokemon-modal input[type='checkbox']").each(function() {
 		modal_options[ jQuery(this).attr("id") ] = jQuery(this).prop("checked");
 	});
-
 	return modal_options;
 }
 
@@ -73,8 +72,7 @@ jQuery(document).ready(function() {
 			jQuery('#pokemon-modal').modal('hide');
 
 			/* Activate the filter in the Pokemon card */
-			/* TODO: Remove the hardcoded filters */
-			["is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender"].forEach(function(single_filter) {
+			POKEMON_FILTERS.forEach(function(single_filter) {
 				if (options[single_filter] != undefined) {
 					if (options[single_filter]) {
 						jQuery(".container-pokemon-" + pokemon_number).addClass(single_filter.replace("_", "-"));
@@ -90,9 +88,9 @@ jQuery(document).ready(function() {
 	if (jQuery(".main-pokemons-list").length) {
 		jQuery.ajax({
 			'type': "GET",
-			'url': ajax_first_page,
+			'url': AJAX_FIRST_PAGE,
 			'data': {
-				"type": ajax_pokemon_type
+				"type": AJAX_POKEMON_TYPE
 			},
 			success: function(ret) {
 				jQuery(".pokemons-grid").html(ret);

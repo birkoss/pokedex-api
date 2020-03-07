@@ -3,15 +3,15 @@
 {% block content %}
 
 <script type="text/javascript">
-	var ajax_first_page = "{% url 'pokemon_archive_page' 1 %}";
-	var ajax_single_option = "{% url 'pokemon_single_options' "0000" %}";
-	var ajax_pokemon_type = "{{ type }}";
+	var AJAX_FIRST_PAGE = "{% url 'pokemon_archive_page' 1 %}";
+	var AJAX_SINGLE_OPTION = "{% url 'pokemon_single_options' "0000" %}";
+	var AJAX_POKEMON_TYPE = "{{ type }}";
 </script>
 
 {% if user.is_authenticated %}
 
 	<script type="text/javascript">
-		var ajax_csrf_token = "{{ csrf_token }}";
+		var AJAX_CSRF_TOKEN = "{{ csrf_token }}";
 	</script>
 
 	<div class="modal fade" id="pokemon-modal" tabindex="-1" role="dialog" aria-labelledby="pokemon-options" aria-hidden="true">
