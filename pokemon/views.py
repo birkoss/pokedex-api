@@ -183,38 +183,42 @@ def pokemons_cards(request, page=1):
 	return HttpResponse(content['cards'] + content['pagination'])
 
 
-def pokemons_detail(user, page, pokemon_type):
+def fetch_pokemons(**kwargs):
 
 	pagination = 40
 
-	filters = {}
-	if pokemon_type == "pokemons":
-		filters['variant__isnull'] = True
-	else:
-		pagination = 200
-		filters['variant__isnull'] = False
+	qs_filters = {}
+	qs_annotate = {}
 
-	if user.is_authenticated:
-		pokemons_qs = Pokemon.objects.annotate(
-			t=FilteredRelation(
-				'userpokemon', condition=(Q(userpokemon__user=user) | Q(userpokemon__isnull=True))
+	qs_values = ["name", "number", "variant__name"]
+
+	if "pokemon_type" in kwargs:
+		if kwargs['pokemon_type'] == "pokemons":
+			qs_filters['variant__isnull'] = True
+		elif kwargs['pokemon_type'] == "forms":
+			pagination = 1000
+			qs_filters['variant__isnull'] = False
+
+	if "user" in kwargs:
+		if kwargs['user'].is_authenticated:
+			qs_values.append("t__is_owned")
+			qs_values.append("t__is_shiny")
+
+			qs_annotate['t'] = FilteredRelation(
+				'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 			)
-		).filter(
-			**filters
-		).select_related('variant').values(
-			"name", "number", "t__is_owned", "t__is_shiny", "variant__name"
-		)
-	else:
-		pokemons_qs = Pokemon.objects.all().filter(
-			**filters
-		).values(
-			"name", "number", "variant__name"
-		)
+
+	pokemons_qs = Pokemon.objects.annotate(
+		**qs_annotate
+	).filter(
+		**qs_filters
+	).select_related('variant').values(
+		*qs_values
+	)
 
 	paginator = Paginator(pokemons_qs, pagination)
-
 	try:
-		pokemons_paginator = paginator.page(page)
+		pokemons_paginator = paginator.page(kwargs['page'])
 	except PageNotAnInteger:
 		pokemons_paginator = paginator.page(1)
 	except EmptyPage:
@@ -223,6 +227,7 @@ def pokemons_detail(user, page, pokemon_type):
 
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
+		print(single_pokemon)
 		pokemon = {
 			'name': single_pokemon['name'],
 			'number': single_pokemon['number'],
@@ -234,8 +239,9 @@ def pokemons_detail(user, page, pokemon_type):
 		if single_pokemon['variant__name'] != None:
 			pokemon['name'] = single_pokemon['variant__name'] + " " + pokemon['name']
 
-		if user.is_authenticated:
+		if 't__is_owned' in single_pokemon:
 			pokemon['is_owned'] = single_pokemon['t__is_owned']
+		if 't__is_shiny' in single_pokemon:
 			pokemon['is_shiny'] = single_pokemon['t__is_shiny']
 
 		pokemons_list.append(pokemon)
@@ -244,3 +250,10 @@ def pokemons_detail(user, page, pokemon_type):
 		"pokemons": pokemons_list,
 		"paginator": pokemons_paginator
 	}
+
+
+def pokemons_detail(user, page, pokemon_type):
+
+	pokemons_list = fetch_pokemons(pokemon_type=pokemon_type, user=user, page=page)
+
+	return pokemons_list
