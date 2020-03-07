@@ -52,6 +52,25 @@ function get_modal_options() {
 }
 
 
+/* Update a filter (add or remove depending on if it's present */
+function update_filter(name, value) {
+
+	jQuery.ajax({
+		type: "POST",
+		url: AJAX_FILTER,
+		data: {
+			type: name,
+			value: value,
+			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
+		},
+		success: function(ret) {
+			console.log(ret);
+		}
+	})
+
+	return false;
+}
+
 jQuery(document).ready(function() {
 	/* Bind the SAVE button in the modal */
 	jQuery("#pokemon-modal .btn-save").click(function() {

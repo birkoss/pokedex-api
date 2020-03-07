@@ -1,6 +1,6 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 
 from social_django.models import UserSocialAuth
@@ -15,6 +15,34 @@ def user_logout(request):
 	logout(request)
 
 	return redirect('pokemon_archive')
+
+
+@login_required
+def user_filter(request):
+	cookie_name = request.POST.get("type", "")
+	cookie_value = request.POST.get("value", "")
+
+	response = {}
+
+	if cookie_value == "" or cookie_name == "":
+		response['status'] = "error"
+		response['msg'] = "The filter and its value are mandatory!"
+		return JsonResponse(response)
+
+	session = request.session.get(cookie_name, [])
+
+	if cookie_value in session:
+		response['result'] = 'removed'
+		session.remove(cookie_value)
+	else:
+		response['result'] = 'added'
+		session.append(cookie_value)
+
+	request.session[cookie_name] = session
+
+	response['status'] = 'ok'
+
+	return JsonResponse(response)
 
 
 @login_required

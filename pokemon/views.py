@@ -118,7 +118,12 @@ def pokemon_archive_page(request, page=1):
 	if pokemon_type == "forms":
 		page = None
 
-	pokemons_data = pokemons_list = fetch_pokemons(pokemon_type=pokemon_type, user=request.user, page=page)
+	hide = request.session.get("hide", [])
+
+	pokemons_data = pokemons_list = fetch_pokemons(pokemon_type=pokemon_type, user=request.user, page=page, pokemon_hide=hide)
+
+	print("Archive Queries")
+	print(connection.queries)
 
 	content = render_to_string("pokemon/card.html", {
 		'pokemons': pokemons_data['pokemons'],
@@ -196,29 +201,32 @@ def fetch_pokemons(**kwargs):
 
 	pagination = 40
 
-	qs_filters = {}
 	qs_annotate = {}
 	qs_values = ["name", "number", "variant__name", "variant__number"]
 
+	qs_filters = Q()
 
 	# Dynamically add language for name and variant
 	for single_language in MODELTRANSLATION_LANGUAGES:
 		qs_values.append("name_" + single_language)
 		qs_values.append("variant__name_" + single_language)
 
+	if "pokemon_hide" in kwargs:
+		for single_filter in kwargs['pokemon_hide']:
+			qs_filters.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
 
 	if "pokemon_type" in kwargs:
 		if kwargs['pokemon_type'] == "pokemons":
-			qs_filters['variant__isnull'] = True
+			qs_filters.add(Q(variant__isnull=True), Q.AND)
 		elif kwargs['pokemon_type'] == "forms":
 			pagination = 1000
-			qs_filters['variant__isnull'] = False
+			qs_filters.add(Q(variant__isnull=False), Q.AND)
 
 	if "pokemon_number" in kwargs:
-		qs_filters['number'] = kwargs['pokemon_number']
+		qs_filters.add(Q(number=kwargs['pokemon_number']), Q.AND)
 
 	if "variant__number" in kwargs:
-		qs_filters['variant__number'] = kwargs['variant__number']
+		qs_filters.add(Q(variant__number=kwargs['variant__number']), Q.AND)
 
 	if "user" in kwargs:
 		if kwargs['user'].is_authenticated:
@@ -229,16 +237,14 @@ def fetch_pokemons(**kwargs):
 				'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 			)
 
-
 	# Get the Pokemons depending on all the differents settings
 	pokemons_qs = Pokemon.objects.annotate(
 		**qs_annotate
 	).filter(
-		**qs_filters
+		qs_filters
 	).select_related('variant').values(
 		*qs_values
 	).order_by('number')
-
 
 	# Pagination
 	pokemons_paginator = None
