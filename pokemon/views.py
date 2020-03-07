@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import connection
 from django.db.models import FilteredRelation, Q
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 
@@ -12,6 +12,8 @@ import math
 from urllib.request import urlopen, Request
 
 from pokemon.models import Pokemon, Generation, UserPokemon
+
+from project.settings import MODELTRANSLATION_LANGUAGES
 
 
 @login_required
@@ -65,8 +67,6 @@ def pokemon_options(request, pokemon_number):
 
 		# Get the existing UserPokemon for this user and pokemon if possible, else create it
 		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
-		print("PO")
-		print(pokemon_options)
 		if pokemon_options is None:
 			pokemon_options = UserPokemon(pokemon=pokemon, user=request.user)
 			pokemon_options.save()
@@ -110,9 +110,20 @@ def pokemons_forms_archive(request):
 
 # @TODO : Merge pokemons_cards with pokemon_detail
 def pokemon_single(request, pokemon_number=None):
-	pokemon = get_object_or_404(Pokemon, number=pokemon_number)
+	pokemons_data = fetch_pokemons(user=request.user, pokemon_number=pokemon_number)
+	
+	if len(pokemons_data['pokemons']) != 1:
+		raise Http404
 
-	return render(request, "pokemon/single.html", {'pokemon': pokemon})
+	if pokemons_data['pokemons'][0]['variant__number'] == None:
+		variants_data = fetch_pokemons(user=request.user, variant__number=pokemon_number)
+	else:
+		variants_data = fetch_pokemons(user=request.user, pokemon_number=pokemons_data['pokemons'][0]['variant__number'])
+
+	return render(request, "pokemon/single.html", {
+		'pokemon': pokemons_data['pokemons'][0],
+		'variants': variants_data['pokemons']
+	})
 
 
 def import_pokemon(request):
@@ -189,8 +200,14 @@ def fetch_pokemons(**kwargs):
 
 	qs_filters = {}
 	qs_annotate = {}
+	qs_values = ["name", "number", "variant__name", "variant__number"]
 
-	qs_values = ["name", "number", "variant__name"]
+
+	# Dynamically add language for name and variant
+	for single_language in MODELTRANSLATION_LANGUAGES:
+		qs_values.append("name_" + single_language)
+		qs_values.append("variant__name_" + single_language)
+
 
 	if "pokemon_type" in kwargs:
 		if kwargs['pokemon_type'] == "pokemons":
@@ -198,6 +215,12 @@ def fetch_pokemons(**kwargs):
 		elif kwargs['pokemon_type'] == "forms":
 			pagination = 1000
 			qs_filters['variant__isnull'] = False
+
+	if "pokemon_number" in kwargs:
+		qs_filters['number'] = kwargs['pokemon_number']
+
+	if "variant__number" in kwargs:
+		qs_filters['variant__number'] = kwargs['variant__number']
 
 	if "user" in kwargs:
 		if kwargs['user'].is_authenticated:
@@ -208,6 +231,8 @@ def fetch_pokemons(**kwargs):
 				'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 			)
 
+
+	# Get the Pokemons depending on all the differents settings
 	pokemons_qs = Pokemon.objects.annotate(
 		**qs_annotate
 	).filter(
@@ -216,24 +241,26 @@ def fetch_pokemons(**kwargs):
 		*qs_values
 	)
 
-	paginator = Paginator(pokemons_qs, pagination)
-	try:
-		pokemons_paginator = paginator.page(kwargs['page'])
-	except PageNotAnInteger:
-		pokemons_paginator = paginator.page(1)
-	except EmptyPage:
-		pokemons_paginator = paginator.page(paginator.num_pages)
+
+	# Pagination
+	if "page" in kwargs:
+		paginator = Paginator(pokemons_qs, pagination)
+		try:
+			pokemons_paginator = paginator.page(kwargs['page'])
+		except PageNotAnInteger:
+			pokemons_paginator = paginator.page(1)
+		except EmptyPage:
+			pokemons_paginator = paginator.page(paginator.num_pages)
+	else:
+		pokemons_paginator = pokemons_qs
 
 
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
-		pokemon = {
-			'name': single_pokemon['name'],
-			'number': single_pokemon['number'],
-			'visible_number': single_pokemon['number'][:3],
-			'is_owned': None,
-			'is_shiny': None,
-		}
+		pokemon = single_pokemon
+		pokemon['is_owned'] = None
+		pokemon['is_shiny'] = None
+		pokemon['visible_number'] = single_pokemon['number'][:3]
 
 		if single_pokemon['variant__name'] != None:
 			pokemon['name'] = single_pokemon['variant__name'] + " " + pokemon['name']
@@ -244,6 +271,7 @@ def fetch_pokemons(**kwargs):
 			pokemon['is_shiny'] = single_pokemon['t__is_shiny']
 
 		pokemons_list.append(pokemon)
+
 
 	return {
 		"pokemons": pokemons_list,

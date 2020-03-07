@@ -7,26 +7,34 @@
 		<div class="card-header"><i class="fas fa-table mr-1"></i>Options</div>
 		<div class="card-body">...</div>
 	</div>
-	<div class="card mb-4">
-		<div class="card-header"><i class="fas fa-table mr-1"></i>Variants</div>
-		<div class="card-body">...</div>
-	</div>
-	<div class="card mb-4 pokemon-names">
-		<div class="card-header"><i class="fas fa-table mr-1"></i>Languages</div>
-		<div class="card-body">
-			{% if pokemon.name_jp %}
-				<p>Japanese: {{ pokemon.name_jp }}</p>
-			{% endif %}
-			{% if pokemon.name_kr %}
-				<p>Korean: {{ pokemon.name_kr }}</p>
-			{% endif %}
-			{% if pokemon.name_fr %}
-				<p>French: {{ pokemon.name_fr }}</p>
-			{% endif %}
-			{% if pokemon.name_de %}
-				<p>German: {{ pokemon.name_de }}</p>
-			{% endif %}
+	{% if variants %}
+		<div class="card mb-4">
+			<div class="card-header"><i class="fas fa-table mr-1"></i>Variants</div>
+			<div class="card-body">
+				<div class="pokemons-grid">
+					{% include "pokemon/card.html" with pokemons=variants %}
+				</div>
+			</div>
 		</div>
-	</div>
+	{% endif %}
+	{% if pokemon.name_jp or pokemon.name_kr or pokemon.name_fr or pokemon.name_de %}
+		<div class="card mb-4 pokemon-names">
+			<div class="card-header"><i class="fas fa-language mr-1"></i>Languages</div>
+			<div class="card-body">
+				{% if pokemon.name_jp %}
+					<p>Japanese: {{ pokemon.name_jp }}</p>
+				{% endif %}
+				{% if pokemon.name_kr %}
+					<p>Korean: {{ pokemon.name_kr }}</p>
+				{% endif %}
+				{% if pokemon.name_fr %}
+					<p>French: {{ pokemon.name_fr }}</p>
+				{% endif %}
+				{% if pokemon.name_de %}
+					<p>German: {{ pokemon.name_de }}</p>
+				{% endif %}
+			</div>
+		</div>
+	{% endif %}
 </div>
 {% endblock %}
