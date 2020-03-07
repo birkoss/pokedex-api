@@ -227,7 +227,6 @@ def fetch_pokemons(**kwargs):
 
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
-		print(single_pokemon)
 		pokemon = {
 			'name': single_pokemon['name'],
 			'number': single_pokemon['number'],

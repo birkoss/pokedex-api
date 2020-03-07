@@ -30,7 +30,7 @@ class Pokemon(models.Model):
 
 	name = models.CharField(max_length=255, default='')
 
-	number = models.CharField(max_length=4, default='', blank=True)
+	number = models.CharField(max_length=255, default='', blank=True)
 
 	generation = models.ForeignKey(Generation, blank=True, null=True, on_delete = models.PROTECT, related_name='generations')
 
