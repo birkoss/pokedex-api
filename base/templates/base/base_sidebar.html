@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block base %}
-<div id="layoutSidenav">
+<div id="layoutSidenav" class="{% if 'is_owned' in request.session.hide %} filter-hide-is_owned{% endif %}{% if 'is_shiny' in request.session.hide %} filter-hide-is_shiny{% endif %}{% if 'is_pokeball' in request.session.hide %} filter-hide-is_pokeball{% endif %}{% if 'is_language' in request.session.hide %} filter-hide-is_language{% endif %}{% if 'is_original_trainer' in request.session.hide %} filter-hide-is_original_trainer{% endif %}{% if 'is_iv' in request.session.hide %} filter-hide-is_iv{% endif %}">
 	<div id="layoutSidenav_nav">
 		<nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
 			<div class="sb-sidenav-menu">
@@ -49,13 +49,13 @@
 					</a>
 					<div class="collapse" id="collapseHidePokemons" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
 						<nav class="sb-sidenav-menu-nested nav">
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_owned');">Owned</a>
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_shiny');">Shiny</a>
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_pokeball');">Pokeball</a>
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_language');">Language</a>
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_gender');">Gender</a>
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_original_trainer');">Original Trainer</a>
-							<a class="nav-link" href="#" onclick="return update_filter('hide', 'is_iv');">IV</a>
+							<a class="nav-link is-owned" href="#" onclick="return update_filter('hide', 'is_owned');"><i class="fas fa-check"></i> Owned</a>
+							<a class="nav-link is-shiny" href="#" onclick="return update_filter('hide', 'is_shiny');"><i class="fas fa-check"></i> Shiny</a>
+							<a class="nav-link is-pokeball" href="#" onclick="return update_filter('hide', 'is_pokeball');"><i class="fas fa-check"></i> Pokeball</a>
+							<a class="nav-link is-language" href="#" onclick="return update_filter('hide', 'is_language');"><i class="fas fa-check"></i> Language</a>
+							<a class="nav-link is-gender" href="#" onclick="return update_filter('hide', 'is_gender');"><i class="fas fa-check"></i> Gender</a>
+							<a class="nav-link is-original-trainer" href="#" onclick="return update_filter('hide', 'is_original_trainer');"><i class="fas fa-check"></i> Original Trainer</a>
+							<a class="nav-link is-iv" href="#" onclick="return update_filter('hide', 'is_iv');"><i class="fas fa-check"></i> IV</a>
 						</nav>
 					</div>
 

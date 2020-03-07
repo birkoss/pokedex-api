@@ -64,12 +64,48 @@ function update_filter(name, value) {
 			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
 		},
 		success: function(ret) {
-			console.log(ret);
+			if (ret['status'] == "ok") {
+				if (ret['result'] == "added") {
+					jQuery(".container-fluid.main-pokemons-list").addClass("filter-hide-" + value);
+					jQuery("#layoutSidenav").addClass("filter-hide-" + value);
+				} else {
+					jQuery(".container-fluid.main-pokemons-list").removeClass("filter-hide-" + value);
+					jQuery("#layoutSidenav").removeClass("filter-hide-" + value);
+				}
+
+				load_pokemons_list();
+			}
 		}
 	})
 
 	return false;
 }
+
+
+function load_pokemons_list() {
+	jQuery.ajax({
+		'type': "GET",
+		'url': AJAX_FIRST_PAGE,
+		'data': {
+			"type": AJAX_POKEMON_TYPE
+		},
+		success: function(ret) {
+			jQuery(".pokemons-grid").html(ret);
+
+			if (jQuery(".pagination-next").length) {
+				jQuery('.pokemons-grid').infiniteScroll({
+					path: '.pagination-next',
+					append: '.card.pokemon',
+					//history: 'push',
+					history: 'none',
+					hideNav: '.pagination',
+					status: '.page-load-status'
+				});
+			}
+		}
+	});
+}
+
 
 jQuery(document).ready(function() {
 	/* Bind the SAVE button in the modal */
@@ -105,26 +141,6 @@ jQuery(document).ready(function() {
 
 	/* Load the first Pokemon page */
 	if (jQuery(".main-pokemons-list").length) {
-		jQuery.ajax({
-			'type': "GET",
-			'url': AJAX_FIRST_PAGE,
-			'data': {
-				"type": AJAX_POKEMON_TYPE
-			},
-			success: function(ret) {
-				jQuery(".pokemons-grid").html(ret);
-
-				if (jQuery(".pagination-next").length) {
-					jQuery('.pokemons-grid').infiniteScroll({
-						path: '.pagination-next',
-						append: '.card.pokemon',
-						//history: 'push',
-						history: 'none',
-						hideNav: '.pagination',
-						status: '.page-load-status'
-					});
-				}
-			}
-		});
+		load_pokemons_list();
 	}
 });

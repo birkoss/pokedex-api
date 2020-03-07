@@ -33,7 +33,7 @@
 	</div>
 {% endif %}
 
-<div class="container-fluid main-pokemons-list">
+<div class="container-fluid main-pokemons-list{% if 'is_owned' in request.session.hide %} filter-hide-is_owned{% endif %}{% if 'is_shiny' in request.session.hide %} filter-hide-is_shiny{% endif %}{% if 'is_pokeball' in request.session.hide %} filter-hide-is_pokeball{% endif %}{% if 'is_language' in request.session.hide %} filter-hide-is_language{% endif %}{% if 'is_original_trainer' in request.session.hide %} filter-hide-is_original_trainer{% endif %}{% if 'is_iv' in request.session.hide %} filter-hide-is_iv{% endif %}">
 	<h1 class="mt-4">Pokedex</h1>
 
 	<div class="pokemons-grid">
