@@ -108,6 +108,13 @@ def pokemon_forms_archive(request):
 	})
 
 
+def pokemon_pokedex_archive(request, region):
+	return render(request, "pokemon/archive.html", {
+		"type": "pokemons",
+		"region": region
+	})
+
+
 def pokemon_archive_page(request, page=1):
 	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
 
@@ -118,9 +125,11 @@ def pokemon_archive_page(request, page=1):
 	if pokemon_type == "forms":
 		page = None
 
+	pokemon_region = request.GET.get("region", "")
+
 	hide = request.session.get("hide", [])
 
-	pokemons_data = pokemons_list = fetch_pokemons(pokemon_type=pokemon_type, user=request.user, page=page, pokemon_hide=hide)
+	pokemons_data = pokemons_list = fetch_pokemons(pokemon_region=pokemon_region, pokemon_type=pokemon_type, user=request.user, page=page, pokemon_hide=hide)
 
 	print("Archive Queries")
 	print(connection.queries)
@@ -202,7 +211,7 @@ def fetch_pokemons(**kwargs):
 	pagination = 40
 
 	qs_annotate = {}
-	qs_values = ["name", "number", "variant__name", "variant__number"]
+	qs_values = ["name", "number", "variant__name", "variant__number", "pokemonregion__number"]
 
 	qs_filters = Q()
 
@@ -210,6 +219,9 @@ def fetch_pokemons(**kwargs):
 	for single_language in MODELTRANSLATION_LANGUAGES:
 		qs_values.append("name_" + single_language)
 		qs_values.append("variant__name_" + single_language)
+
+	if "pokemon_region" in kwargs and kwargs['pokemon_region'] != "":
+		qs_filters.add(Q(pokemonregion__region__slug=kwargs['pokemon_region']), Q.AND)
 
 	if "pokemon_hide" in kwargs:
 		for single_filter in kwargs['pokemon_hide']:
@@ -263,7 +275,10 @@ def fetch_pokemons(**kwargs):
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
 		pokemon = single_pokemon
-		pokemon['visible_number'] = single_pokemon['number'][:3]
+		pokemon['visible_number'] = pokemon['number'][:3]
+
+		if "pokemonregion__number" in single_pokemon:
+			pokemon['visible_number'] = single_pokemon['pokemonregion__number'][:3]
 
 		if single_pokemon['variant__name'] != None:
 			pokemon['name'] = single_pokemon['variant__name'] + " " + pokemon['name']

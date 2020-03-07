@@ -32,10 +32,15 @@ class Pokemon(models.Model):
 
 	number = models.CharField(max_length=255, default='', blank=True)
 
-	generation = models.ForeignKey(Generation, blank=True, null=True, on_delete = models.PROTECT, related_name='generations')
-
 	def __str__(self):
 		return self.name
+
+
+class PokemonRegion(models.Model):
+	pokemon = models.ForeignKey(Pokemon, blank=True, null=True, on_delete = models.PROTECT)
+	region = models.ForeignKey(Region, blank=True, null=True, on_delete = models.PROTECT)
+
+	number = models.CharField(max_length=255, default='')
 
 
 class UserPokemon(models.Model):
