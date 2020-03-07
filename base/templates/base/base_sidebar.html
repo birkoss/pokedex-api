@@ -42,6 +42,7 @@
 						</nav>
 					</div>
 
+					{% if user.is_authenticated %}
 					<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseHidePokemons" aria-expanded="false" aria-controls="collapseHidePokemons">
 						<div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
 						Hide Pokemons
@@ -58,6 +59,7 @@
 							<a class="nav-link is-iv" href="#" onclick="return update_filter('hide', 'is_iv');"><i class="fas fa-check"></i> IV</a>
 						</nav>
 					</div>
+					{% endif %}
 
 				</div>
 			</div>
