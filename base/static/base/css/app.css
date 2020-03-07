@@ -138,8 +138,17 @@ a.pokemon-sprite:before {
 	image-rendering: crisp-edges;*/
 }
 
-body.logged-in a.pokemon-sprite:not(.is-owned):before {
+body.logged-in .card.pokemon:not(.is-owned) a.pokemon-sprite:before {
 	opacity: 0.5;
+}
+
+body.logged-in .card.pokemon:not(.is-shiny) .option-is_shiny,
+body.logged-in .card.pokemon:not(.is-pokeball) .option-is_pokeball,
+body.logged-in .card.pokemon:not(.is-language) .option-is_language,
+body.logged-in .card.pokemon:not(.is-iv) .option-is_iv,
+body.logged-in .card.pokemon:not(.is-original-trainer) .option-is_original_trainer,
+body.logged-in .card.pokemon:not(.is-gender) .option-is_gender {
+	opacity: 0.2;
 }
 
 /* Error 404 */

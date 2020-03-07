@@ -1,6 +1,6 @@
 {% for pokemon in pokemons %}
-	<div class="card pokemon container-pokemon-{{ pokemon.number }}">
-		<a href="{% url 'pokemon_single' pokemon.number %}" class="card-img-top pokemon-sprite pokemon-{{ pokemon.number }}{% if is_logged and pokemon.is_owned %} is-owned{% endif %}"></a>
+	<div class="card pokemon container-pokemon-{{ pokemon.number }}{% if is_logged %}{% if pokemon.is_owned %} is-owned{% endif %}{% if pokemon.is_shiny %} is-shiny{% endif %}{% if pokemon.is_pokeball %} is-pokeball{% endif %}{% if pokemon.is_language %} is-language{% endif %}{% if pokemon.is_iv %} is-iv{% endif %}{% if pokemon.is_original_trainer %} is-original-trainer{% endif %}{% if pokemon.is_gender %} is-gender{% endif %}{% endif %}">
+		<a href="{% url 'pokemon_single' pokemon.number %}" class="card-img-top pokemon-sprite pokemon-{{ pokemon.number }}"></a>
 		<div class="card-body">
 			<p class="pokemon_number">{{ pokemon.visible_number }}</p>
 			<h5>{{ pokemon.name }}</h5>
@@ -9,6 +9,17 @@
 				<a href="{% url 'pokemon_single' pokemon.number %}" class="btn btn-primary"><i class="fas fa-angle-double-right"></i></a>
 			{% else %}
 				<a href="{% url 'pokemon_single' pokemon.number %}" class="btn btn-primary"><i class="fas fa-angle-double-right"></i></a>
+			{% endif %}
+
+			{% if is_logged %}
+				<div class="pokemon_options">
+					<i class="option-is_shiny fas fa-star"></i>
+					<i class="option-is_pokeball fas fa-dot-circle"></i>
+					<i class="option-is_language fas fa-language"></i>
+					<i class="option-is_iv fas fa-dumbbell"></i>
+					<i class="option-is_original_trainer fas fa-user"></i>
+					<i class="option-is_gender fas fa-venus-mars"></i>
+				</div>
 			{% endif %}
 		</div>
 	</div>

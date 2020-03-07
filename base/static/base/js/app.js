@@ -72,13 +72,17 @@ jQuery(document).ready(function() {
 			jQuery("#pokemon-modal .btn-save").prop("disabled", false).html("Save");
 			jQuery('#pokemon-modal').modal('hide');
 
-			if (options['is_owned'] != undefined) {
-				if (options['is_owned']) {
-					jQuery(".container-pokemon-" + pokemon_number + " a.pokemon-sprite").addClass("is-owned");
-				} else {
-					jQuery(".container-pokemon-" + pokemon_number + " a.pokemon-sprite").removeClass("is-owned");
+			/* Activate the filter in the Pokemon card */
+			/* TODO: Remove the hardcoded filters */
+			["is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender"].forEach(function(single_filter) {
+				if (options[single_filter] != undefined) {
+					if (options[single_filter]) {
+						jQuery(".container-pokemon-" + pokemon_number).addClass(single_filter.replace("_", "-"));
+					} else {
+						jQuery(".container-pokemon-" + pokemon_number).removeClass(single_filter.replace("_", "-"));
+					}
 				}
-			}
+			});
 		});
 	});
 
