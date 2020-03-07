@@ -58,6 +58,11 @@ nav.sb-sidenav.sb-sidenav-dark .sb-sidenav-menu .nav-link {
 	background-color: #376092 !important;
 }
 
+.btn-primary.disabled, .btn-primary:disabled {
+	background-color: #cccccc !important;
+	border-color: #cccccc !important;
+}
+
 /* Homepage Pokemons Grid */
 
 .pokemons-grid {
