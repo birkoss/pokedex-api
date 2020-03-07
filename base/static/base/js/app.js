@@ -40,14 +40,16 @@ jQuery(document).ready(function() {
 			success: function(ret) {
 				jQuery(".pokemons-grid").html(ret);
 
-				jQuery('.pokemons-grid').infiniteScroll({
-					path: '.pagination-next',
-					append: '.card.pokemon',
-					//history: 'push',
-					history: 'none',
-					hideNav: '.pagination',
-					status: '.page-load-status'
-				});
+				if (jQuery(".pagination-next").length) {
+					jQuery('.pokemons-grid').infiniteScroll({
+						path: '.pagination-next',
+						append: '.card.pokemon',
+						//history: 'push',
+						history: 'none',
+						hideNav: '.pagination',
+						status: '.page-load-status'
+					});
+				}
 			}
 		});
 	}
@@ -73,6 +75,7 @@ function pokemon_change_option(pokemon_number, option_name) {
 function pokemon_show_modal(pokemon_number) {
 	jQuery('#pokemon-modal .modal-body').load(ajax_single_option.replace("0000", pokemon_number), function() {
 		jQuery('#pokemon-modal').modal({show:true});
+		jQuery('[data-toggle="tooltip"]').tooltip();
 	});
 
 	return false;

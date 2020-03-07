@@ -44,3 +44,8 @@ class UserPokemon(models.Model):
 
 	is_owned = models.BooleanField(default=False)
 	is_shiny = models.BooleanField(default=False)
+	is_pokeball = models.BooleanField(default=False)
+	is_language = models.BooleanField(default=False)
+	is_iv = models.BooleanField(default=False)
+	is_original_trainer = models.BooleanField(default=False)
+	is_gender = models.BooleanField(default=False)

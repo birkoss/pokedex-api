@@ -96,16 +96,41 @@ def pokemon_options(request, pokemon_number):
 		return JsonResponse(response)
 
 
-def index(request):
+def pokemon_archive(request):
 	return render(request, "pokemon/archive.html", {
 		"type": "pokemons"
 	})
 
 
-def pokemons_forms_archive(request):
+def pokemon_forms_archive(request):
 	return render(request, "pokemon/archive.html", {
 		"type": "forms"
 	})
+
+
+def pokemon_archive_page(request, page=1):
+	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
+
+	if request_header_requested_with != "XMLHttpRequest":
+		return redirect('pokemon_archive')
+
+	pokemon_type = request.GET.get("type", "pokemons")
+	if pokemon_type == "forms":
+		page = None
+
+	pokemons_data = pokemons_list = fetch_pokemons(pokemon_type=pokemon_type, user=request.user, page=page)
+
+	content = render_to_string("pokemon/card.html", {
+		'pokemons': pokemons_data['pokemons'],
+		'is_logged': request.user.is_authenticated
+	})
+
+	if page != None:
+		content += render_to_string("pokemon/pagination.html", {
+		'paginator': pokemons_data['paginator'],
+	})
+
+	return HttpResponse(content)
 
 
 # @TODO : Merge pokemons_cards with pokemon_detail
@@ -165,36 +190,9 @@ def import_pokemon(request):
 	return HttpResponse("<p>test2</p>")
 
 
-def pokemons_cards(request, page=1):
-	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
-
-	if request_header_requested_with != "XMLHttpRequest":
-		return redirect('pokemon_archive')
-
-	pokemon_type = request.GET.get("type", "pokemons")
-
-	pokemons_data = pokemons_detail(request.user, page, pokemon_type)
-
-	content_format = request.GET.get("format", "html")
-
-	content = {}
-
-	content['cards'] = render_to_string("pokemon/card.html", {
-		'pokemons': pokemons_data['pokemons'],
-		'is_logged': request.user.is_authenticated
-	})
-
-	content['pagination'] = render_to_string("pokemon/pagination.html", {
-		'paginator': pokemons_data['paginator'],
-	})
-
-	if (content_format == "json"):
-		return JsonResponse(content)
-
-	return HttpResponse(content['cards'] + content['pagination'])
-
-
 def fetch_pokemons(**kwargs):
+
+	pokemon_filters = ("is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender")
 
 	pagination = 40
 
@@ -224,8 +222,8 @@ def fetch_pokemons(**kwargs):
 
 	if "user" in kwargs:
 		if kwargs['user'].is_authenticated:
-			qs_values.append("t__is_owned")
-			qs_values.append("t__is_shiny")
+			for single_filter in pokemon_filters:
+				qs_values.append("t__" + single_filter)
 
 			qs_annotate['t'] = FilteredRelation(
 				'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
@@ -239,11 +237,12 @@ def fetch_pokemons(**kwargs):
 		**qs_filters
 	).select_related('variant').values(
 		*qs_values
-	)
+	).order_by('number')
 
 
 	# Pagination
-	if "page" in kwargs:
+	pokemons_paginator = None
+	if "page" in kwargs and kwargs['page'] != None:
 		paginator = Paginator(pokemons_qs, pagination)
 		try:
 			pokemons_paginator = paginator.page(kwargs['page'])
@@ -258,17 +257,18 @@ def fetch_pokemons(**kwargs):
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
 		pokemon = single_pokemon
-		pokemon['is_owned'] = None
-		pokemon['is_shiny'] = None
 		pokemon['visible_number'] = single_pokemon['number'][:3]
 
 		if single_pokemon['variant__name'] != None:
 			pokemon['name'] = single_pokemon['variant__name'] + " " + pokemon['name']
 
-		if 't__is_owned' in single_pokemon:
-			pokemon['is_owned'] = single_pokemon['t__is_owned']
-		if 't__is_shiny' in single_pokemon:
-			pokemon['is_shiny'] = single_pokemon['t__is_shiny']
+		# Init filters to default values
+		for single_filter in pokemon_filters:
+			pokemon[ single_filter ] = None
+
+			# Update the filter in they are found in the database
+			if "t__" + single_filter in single_pokemon:
+				pokemon[ single_filter ] = single_pokemon["t__" + single_filter]
 
 		pokemons_list.append(pokemon)
 
@@ -278,9 +278,3 @@ def fetch_pokemons(**kwargs):
 		"paginator": pokemons_paginator
 	}
 
-
-def pokemons_detail(user, page, pokemon_type):
-
-	pokemons_list = fetch_pokemons(pokemon_type=pokemon_type, user=user, page=page)
-
-	return pokemons_list
