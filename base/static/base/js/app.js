@@ -54,7 +54,6 @@ function get_modal_options() {
 
 /* Update a filter (add or remove depending on if it's present */
 function update_filter(name, value) {
-
 	jQuery.ajax({
 		type: "POST",
 		url: AJAX_FILTER,
@@ -82,6 +81,7 @@ function update_filter(name, value) {
 }
 
 
+/* Load the Pokemons list first page */
 function load_pokemons_list() {
 	jQuery.ajax({
 		'type': "GET",
@@ -90,7 +90,8 @@ function load_pokemons_list() {
 			"region": AJAX_POKEMON_REGION
 		},
 		success: function(ret) {
-			jQuery(".pokemons-grid").html(ret);
+			jQuery(".pokemons-grid").html(ret['content']);
+			jQuery(".total-pokemons").html(ret['total']);
 
 			if (jQuery(".pagination-next").length) {
 				jQuery('.pokemons-grid').infiniteScroll({

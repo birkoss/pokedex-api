@@ -116,38 +116,42 @@ def pokemon_pokedex_archive(request, region=None):
 
 
 def pokemon_pokedex_archive_page(request, region=None, page=1):
-
-
 	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
-
 	if request_header_requested_with != "XMLHttpRequest":
 		return redirect('pokemon_pokedex_archive', region=region)
 
-	content = fetch_page(request, page, 'pokemon_pokedex_archive_page', **{'pokemon_region':region})
+	page_content = fetch_page(request, page, 'pokemon_pokedex_archive_page', **{'pokemon_region':region})
 
-	return HttpResponse(content)
+	if page == 1:
+		return JsonResponse(page_content)
+	else:
+		return HttpResponse(page_content['content'])
 
 
 def pokemon_archive_page(request, page=1):
 	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
-
 	if request_header_requested_with != "XMLHttpRequest":
 		return redirect('pokemon_archive')
 
-	content = fetch_page(request, page, 'pokemon_archive_page', **{'pokemon_type':"pokemons"})
+	page_content = fetch_page(request, page, 'pokemon_archive_page', **{'pokemon_type':"pokemons"})
 
-	return HttpResponse(content)
+	if page == 1:
+		return JsonResponse(page_content)
+	else:
+		return HttpResponse(page_content['content'])
 
 
 def pokemon_forms_archive_page(request, page=1):
 	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
-
 	if request_header_requested_with != "XMLHttpRequest":
 		return redirect('pokemon_forms_archive')
 
-	content = fetch_page(request, page, 'pokemon_forms_archive_page', **{'pokemon_type':"forms"})
+	page_content = fetch_page(request, page, 'pokemon_forms_archive_page', **{'pokemon_type':"forms"})
 
-	return HttpResponse(content)
+	if page == 1:
+		return JsonResponse(page_content)
+	else:
+		return HttpResponse(page_content['content'])
 
 
 # @TODO : Merge pokemons_cards with pokemon_detail
@@ -171,8 +175,8 @@ def pokemon_single(request, pokemon_number=None):
 def import_pokemon(request):
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 
-	import_names = False
-	import_forms = False
+	import_names = True
+	import_forms = True
 	import_regions = True
 
 	# Import Pokemons from their names
@@ -189,7 +193,6 @@ def import_pokemon(request):
 					for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
 						if mlid in pokemons[national_number]:
 							data[mlid.replace("s/", "_")] = pokemons[national_number][mlid]
-
 
 					# Create the new Pokemon
 					pokemon = Pokemon(**data)
@@ -212,6 +215,8 @@ def import_pokemon(request):
 					for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
 						if mlid in single_pokemon:
 							data[mlid.replace("s/", "_")] = single_pokemon[mlid]
+
+					# Create the new Forms
 					pokemon = Pokemon(**data)
 					pokemon.save();
 					print("Created Form: " + single_pokemon['number'])
@@ -236,7 +241,7 @@ def import_pokemon(request):
 								print("Created regional: " + single_region + " #" + single_pokemon['regional'])
 					
 
-	return HttpResponse("<p>test2</p>")
+	return HttpResponse("<p>Done</p>")
 
 
 def fetch_pokemons(**kwargs):
@@ -296,9 +301,14 @@ def fetch_pokemons(**kwargs):
 		*qs_values
 	).order_by(order_field)
 	# Pagination
+	total_pokemons = 0;
+
+	print(kwargs)
+
 	pokemons_paginator = None
 	if "page" in kwargs and kwargs['page'] != None:
 		paginator = Paginator(pokemons_qs, pagination)
+		total_pokemons = paginator.count
 		try:
 			pokemons_paginator = paginator.page(kwargs['page'])
 		except PageNotAnInteger:
@@ -307,6 +317,7 @@ def fetch_pokemons(**kwargs):
 			pokemons_paginator = paginator.page(paginator.num_pages)
 	else:
 		pokemons_paginator = pokemons_qs
+		total_pokemons = len(pokemons_qs)
 
 
 	pokemons_list = []
@@ -318,7 +329,7 @@ def fetch_pokemons(**kwargs):
 			pokemon['visible_number'] = single_pokemon['pokemonregion__number'][:3]
 
 		if single_pokemon['variant__name'] != None:
-			pokemon['name'] = single_pokemon['variant__name'] + " " + pokemon['name']
+			pokemon['name'] = single_pokemon['name'].replace("#NAME#", single_pokemon['variant__name'])
 
 		# Init filters to default values
 		for single_filter in pokemon_filters:
@@ -333,22 +344,30 @@ def fetch_pokemons(**kwargs):
 
 	return {
 		"pokemons": pokemons_list,
-		"paginator": pokemons_paginator
+		"paginator": pokemons_paginator,
+		"total_pokemons": total_pokemons
 	}
 
 
 def fetch_page(request, page, page_url, **kwargs):
 
+	page_content = {
+		'content': "",
+		'total': 0
+	}
+
 	kwargs['hide'] = request.session.get("hide", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user
 
-	pokemons_data = pokemons_list = fetch_pokemons(**kwargs)
+	pokemons_data = fetch_pokemons(**kwargs)
+
+	page_content['total'] = pokemons_data['total_pokemons']
 
 	print("Archive Queries")
 	print(connection.queries)
 
-	content = render_to_string("pokemon/card.html", {
+	page_content['content'] = render_to_string("pokemon/card.html", {
 		'pokemons': pokemons_data['pokemons'],
 		'is_logged': request.user.is_authenticated
 	})
@@ -360,6 +379,6 @@ def fetch_page(request, page, page_url, **kwargs):
 		}
 		if "pokemon_region" in kwargs:
 			pagination_args['pokemon_region'] = kwargs['pokemon_region']
-		content += render_to_string("pokemon/pagination.html", pagination_args)
+		page_content['content'] += render_to_string("pokemon/pagination.html", pagination_args)
 
-	return content
+	return page_content

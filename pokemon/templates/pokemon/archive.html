@@ -2,7 +2,6 @@
 
 {% block content %}
 
-@TODO : Allow paging to work on forms AND regions
 <script type="text/javascript">
 	{% if region %}
 		var AJAX_FIRST_PAGE = "{% url page_url region 1 %}";
@@ -40,6 +39,7 @@
 
 <div class="container-fluid main-pokemons-list{% if 'is_owned' in request.session.hide %} filter-hide-is_owned{% endif %}{% if 'is_shiny' in request.session.hide %} filter-hide-is_shiny{% endif %}{% if 'is_pokeball' in request.session.hide %} filter-hide-is_pokeball{% endif %}{% if 'is_language' in request.session.hide %} filter-hide-is_language{% endif %}{% if 'is_original_trainer' in request.session.hide %} filter-hide-is_original_trainer{% endif %}{% if 'is_iv' in request.session.hide %} filter-hide-is_iv{% endif %}">
 	<h1 class="mt-4">Pokedex</h1>
+	<h1 class="mt-4 total-pokemons">0000</h1>
 
 	<div class="pokemons-grid">
 		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
