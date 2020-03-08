@@ -98,21 +98,34 @@ def pokemon_options(request, pokemon_number):
 
 def pokemon_archive(request):
 	return render(request, "pokemon/archive.html", {
-		"type": "pokemons"
+		"page_url": "pokemon_archive_page"
 	})
 
 
 def pokemon_forms_archive(request):
 	return render(request, "pokemon/archive.html", {
-		"type": "forms"
+		"page_url": "pokemon_forms_archive_page"
 	})
 
 
-def pokemon_pokedex_archive(request, region):
+def pokemon_pokedex_archive(request, region=None):
 	return render(request, "pokemon/archive.html", {
-		"type": "pokemons",
+		"page_url": "pokemon_pokedex_archive_page",
 		"region": region
 	})
+
+
+def pokemon_pokedex_archive_page(request, region=None, page=1):
+
+
+	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
+
+	if request_header_requested_with != "XMLHttpRequest":
+		return redirect('pokemon_pokedex_archive', region=region)
+
+	content = fetch_page(request, page, 'pokemon_pokedex_archive_page', **{'pokemon_region':region})
+
+	return HttpResponse(content)
 
 
 def pokemon_archive_page(request, page=1):
@@ -121,28 +134,18 @@ def pokemon_archive_page(request, page=1):
 	if request_header_requested_with != "XMLHttpRequest":
 		return redirect('pokemon_archive')
 
-	pokemon_type = request.GET.get("type", "pokemons")
-	if pokemon_type == "forms":
-		page = None
+	content = fetch_page(request, page, 'pokemon_archive_page', **{'pokemon_type':"pokemons"})
 
-	pokemon_region = request.GET.get("region", "")
+	return HttpResponse(content)
 
-	hide = request.session.get("hide", [])
 
-	pokemons_data = pokemons_list = fetch_pokemons(pokemon_region=pokemon_region, pokemon_type=pokemon_type, user=request.user, page=page, pokemon_hide=hide)
+def pokemon_forms_archive_page(request, page=1):
+	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
 
-	print("Archive Queries")
-	print(connection.queries)
+	if request_header_requested_with != "XMLHttpRequest":
+		return redirect('pokemon_forms_archive')
 
-	content = render_to_string("pokemon/card.html", {
-		'pokemons': pokemons_data['pokemons'],
-		'is_logged': request.user.is_authenticated
-	})
-
-	if page != None:
-		content += render_to_string("pokemon/pagination.html", {
-		'paginator': pokemons_data['paginator'],
-	})
+	content = fetch_page(request, page, 'pokemon_forms_archive_page', **{'pokemon_type':"forms"})
 
 	return HttpResponse(content)
 
@@ -267,7 +270,6 @@ def fetch_pokemons(**kwargs):
 		if kwargs['pokemon_type'] == "pokemons":
 			qs_filters.add(Q(variant__isnull=True), Q.AND)
 		elif kwargs['pokemon_type'] == "forms":
-			pagination = 1000
 			qs_filters.add(Q(variant__isnull=False), Q.AND)
 
 	if "pokemon_number" in kwargs:
@@ -293,7 +295,6 @@ def fetch_pokemons(**kwargs):
 	).select_related('variant').values(
 		*qs_values
 	).order_by(order_field)
-
 	# Pagination
 	pokemons_paginator = None
 	if "page" in kwargs and kwargs['page'] != None:
@@ -335,3 +336,30 @@ def fetch_pokemons(**kwargs):
 		"paginator": pokemons_paginator
 	}
 
+
+def fetch_page(request, page, page_url, **kwargs):
+
+	kwargs['hide'] = request.session.get("hide", [])
+	kwargs['page'] = page
+	kwargs['user'] = request.user
+
+	pokemons_data = pokemons_list = fetch_pokemons(**kwargs)
+
+	print("Archive Queries")
+	print(connection.queries)
+
+	content = render_to_string("pokemon/card.html", {
+		'pokemons': pokemons_data['pokemons'],
+		'is_logged': request.user.is_authenticated
+	})
+
+	if page != None:
+		pagination_args = {
+			'page_url': page_url,
+			'paginator': pokemons_data['paginator'],
+		}
+		if "pokemon_region" in kwargs:
+			pagination_args['pokemon_region'] = kwargs['pokemon_region']
+		content += render_to_string("pokemon/pagination.html", pagination_args)
+
+	return content

@@ -4,10 +4,13 @@
 
 @TODO : Allow paging to work on forms AND regions
 <script type="text/javascript">
-	var AJAX_FIRST_PAGE = "{% url 'pokemon_archive_page' 1 %}";
+	{% if region %}
+		var AJAX_FIRST_PAGE = "{% url page_url region 1 %}";
+	{% else %}
+		var AJAX_FIRST_PAGE = "{% url page_url 1 %}";
+	{% endif %}
 	var AJAX_SINGLE_OPTION = "{% url 'pokemon_single_options' "0000" %}";
 	var AJAX_FILTER = "{% url 'user_filter' %}";
-	var AJAX_POKEMON_TYPE = "{{ type }}";
 	var AJAX_POKEMON_REGION = "{% if region %}{{ region }}{% endif %}";
 </script>
 

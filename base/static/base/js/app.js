@@ -87,7 +87,6 @@ function load_pokemons_list() {
 		'type': "GET",
 		'url': AJAX_FIRST_PAGE,
 		'data': {
-			"type": AJAX_POKEMON_TYPE,
 			"region": AJAX_POKEMON_REGION
 		},
 		success: function(ret) {
