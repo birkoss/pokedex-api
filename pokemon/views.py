@@ -168,37 +168,44 @@ def pokemon_single(request, pokemon_number=None):
 def import_pokemon(request):
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 
-	reg_url = "https://birkoss.com/pokemon_names.json"
-	req = Request(url=reg_url, headers=headers)
-
-	with urllib.request.urlopen(req) as url:
+	# Import Pokemons from their names
+	json_url = "https://birkoss.com/pokemon_names.json"
+	r = Request(url=json_url, headers=headers)
+	with urllib.request.urlopen(r) as url:
 		pokemons = json.loads(url.read().decode())
-		for single_number in pokemons:
-			pokemon = Pokemon.objects.filter(number=single_number)
+		for national_number in pokemons:
+			pokemon = Pokemon.objects.filter(number=national_number)
 			if len(pokemon) == 0:
 				data = {}
-				data['number'] = single_number
+				data['number'] = national_number
 				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
-					if mlid in pokemons[single_number]:
-						data[mlid.replace("s/", "_")] = pokemons[single_number][mlid]
+					if mlid in pokemons[national_number]:
+						data[mlid.replace("s/", "_")] = pokemons[national_number][mlid]
 
 
 				# Create the new Pokemon
 				pokemon = Pokemon(**data)
 				pokemon.save()
-				print("Created: " + single_number)
+				print("Created Pokemon: " + national_number)
 
-		#for single_pokemon in data['forms']:
-		#	pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
-		#	if len(pokemon) == 0:
-		#		data = {}
-		#		data['number'] = single_pokemon['number']
-		#		data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
-		#		for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
-		#			if mlid in single_pokemon:
-		#				data[mlid.replace("s/", "_")] = single_pokemon[mlid]
-		#		pokemon = Pokemon(**data)
-		#		pokemon.save();
+	# Import Forms
+	json_url = "https://birkoss.com/pokemon_forms.json"
+	r = Request(url=json_url, headers=headers)
+
+	with urllib.request.urlopen(r) as url:
+		pokemons = json.loads(url.read().decode())
+		for single_pokemon in pokemons:
+			pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
+			if len(pokemon) == 0:
+				data = {}
+				data['number'] = single_pokemon['number']
+				data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
+				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
+					if mlid in single_pokemon:
+						data[mlid.replace("s/", "_")] = single_pokemon[mlid]
+				pokemon = Pokemon(**data)
+				pokemon.save();
+				print("Created Form: " + single_pokemon['number'])
 
 
 	return HttpResponse("<p>test2</p>")
