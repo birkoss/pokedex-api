@@ -77,11 +77,15 @@ a.nav-link.active {
 .pokemons-grid > .card.pokemon {
 	width: 180px;
 	margin: 10px;
+
+	display: flex;
+	align-items: center;
 }
 
 .pokemons-grid > .card.pokemon > a.pokemon-sprite {
 	display: flex;
 	justify-content: center;
+	align-items: center;
 }
 
 .pokemons-grid > .card.pokemon > .card-body {
@@ -130,11 +134,21 @@ a.nav-link.active {
 
 /* Pokemons sprites */
 
+a.pokemon-sprite {
+	width: 100px;
+	height: 100px;
+}
+
 a.pokemon-sprite:before {
 	background-image: url(../sprites/pokemons.png);
 	background-repeat: no-repeat;
 	content: " ";
 	display: block;
+
+	transform: scale(2);
+	image-rendering: pixelated;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: crisp-edges;
 
     /*transform: scale(2);
 	image-rendering: pixelated;

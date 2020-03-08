@@ -168,37 +168,37 @@ def pokemon_single(request, pokemon_number=None):
 def import_pokemon(request):
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 
-	reg_url = "https://birkoss.com/pokemon.json"
+	reg_url = "https://birkoss.com/pokemon_names.json"
 	req = Request(url=reg_url, headers=headers)
 
 	with urllib.request.urlopen(req) as url:
-		data = json.loads(url.read().decode())
-		for single_pokemon in data['pokemons']:
-			pokemon = Pokemon.objects.filter(name_en=single_pokemon['names/en'])
+		pokemons = json.loads(url.read().decode())
+		for single_number in pokemons:
+			pokemon = Pokemon.objects.filter(number=single_number)
 			if len(pokemon) == 0:
 				data = {}
-				data['number'] = single_pokemon['national']
+				data['number'] = single_number
 				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
-					if mlid in single_pokemon:
-						data[mlid.replace("s/", "_")] = single_pokemon[mlid]
+					if mlid in pokemons[single_number]:
+						data[mlid.replace("s/", "_")] = pokemons[single_number][mlid]
 
-				data['generation'] = Generation.objects.filter(name=single_pokemon['generation'])[0]
 
 				# Create the new Pokemon
 				pokemon = Pokemon(**data)
 				pokemon.save()
+				print("Created: " + single_number)
 
-		for single_pokemon in data['forms']:
-			pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
-			if len(pokemon) == 0:
-				data = {}
-				data['number'] = single_pokemon['number']
-				data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
-				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
-					if mlid in single_pokemon:
-						data[mlid.replace("s/", "_")] = single_pokemon[mlid]
-				pokemon = Pokemon(**data)
-				pokemon.save();
+		#for single_pokemon in data['forms']:
+		#	pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
+		#	if len(pokemon) == 0:
+		#		data = {}
+		#		data['number'] = single_pokemon['number']
+		#		data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
+		#		for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
+		#			if mlid in single_pokemon:
+		#				data[mlid.replace("s/", "_")] = single_pokemon[mlid]
+		#		pokemon = Pokemon(**data)
+		#		pokemon.save();
 
 
 	return HttpResponse("<p>test2</p>")
@@ -211,7 +211,7 @@ def fetch_pokemons(**kwargs):
 	pagination = 40
 
 	qs_annotate = {}
-	qs_values = ["name", "number", "variant__name", "variant__number", "pokemonregion__number"]
+	qs_values = ["name", "number", "variant__name", "variant__number"]
 
 	qs_filters = Q()
 
@@ -222,6 +222,7 @@ def fetch_pokemons(**kwargs):
 
 	if "pokemon_region" in kwargs and kwargs['pokemon_region'] != "":
 		qs_filters.add(Q(pokemonregion__region__slug=kwargs['pokemon_region']), Q.AND)
+		qs_values.append("pokemonregion__number")
 
 	if "pokemon_hide" in kwargs:
 		for single_filter in kwargs['pokemon_hide']:
@@ -256,7 +257,7 @@ def fetch_pokemons(**kwargs):
 		qs_filters
 	).select_related('variant').values(
 		*qs_values
-	).order_by('number')
+	).order_by('-number')
 
 	# Pagination
 	pokemons_paginator = None
@@ -277,7 +278,7 @@ def fetch_pokemons(**kwargs):
 		pokemon = single_pokemon
 		pokemon['visible_number'] = pokemon['number'][:3]
 
-		if "pokemonregion__number" in single_pokemon:
+		if 'pokemonregion__number' in single_pokemon and single_pokemon['pokemonregion__number'] != None:
 			pokemon['visible_number'] = single_pokemon['pokemonregion__number'][:3]
 
 		if single_pokemon['variant__name'] != None:
