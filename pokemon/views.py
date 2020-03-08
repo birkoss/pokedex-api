@@ -257,7 +257,7 @@ def fetch_pokemons(**kwargs):
 		qs_filters
 	).select_related('variant').values(
 		*qs_values
-	).order_by('-number')
+	).order_by('number')
 
 	# Pagination
 	pokemons_paginator = None

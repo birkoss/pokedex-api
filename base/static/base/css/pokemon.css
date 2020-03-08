@@ -1,8 +1,4 @@
-.pokemon:before {
-            background-image: url('images.png');
-            background-repeat: no-repeat;
-        }
-        
+
         .pokemon-890:before {
             background-position: 0 0;
             width: 58px;
@@ -5342,3 +5338,5 @@
             width: 14px;
             height: 14px;
         }
+
+        
