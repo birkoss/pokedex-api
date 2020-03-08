@@ -11,7 +11,7 @@ import json
 import math
 from urllib.request import urlopen, Request
 
-from pokemon.models import Pokemon, Generation, UserPokemon
+from pokemon.models import Pokemon, Region, Generation, UserPokemon, PokemonRegion
 
 from project.settings import MODELTRANSLATION_LANGUAGES
 
@@ -168,45 +168,70 @@ def pokemon_single(request, pokemon_number=None):
 def import_pokemon(request):
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 
+	import_names = False
+	import_forms = False
+	import_regions = True
+
 	# Import Pokemons from their names
-	json_url = "https://birkoss.com/pokemon_names.json"
-	r = Request(url=json_url, headers=headers)
-	with urllib.request.urlopen(r) as url:
-		pokemons = json.loads(url.read().decode())
-		for national_number in pokemons:
-			pokemon = Pokemon.objects.filter(number=national_number)
-			if len(pokemon) == 0:
-				data = {}
-				data['number'] = national_number
-				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
-					if mlid in pokemons[national_number]:
-						data[mlid.replace("s/", "_")] = pokemons[national_number][mlid]
+	if import_names:
+		json_url = "https://birkoss.com/pokemon_names.json"
+		r = Request(url=json_url, headers=headers)
+		with urllib.request.urlopen(r) as url:
+			pokemons = json.loads(url.read().decode())
+			for national_number in pokemons:
+				pokemon = Pokemon.objects.filter(number=national_number)
+				if len(pokemon) == 0:
+					data = {}
+					data['number'] = national_number
+					for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
+						if mlid in pokemons[national_number]:
+							data[mlid.replace("s/", "_")] = pokemons[national_number][mlid]
 
 
-				# Create the new Pokemon
-				pokemon = Pokemon(**data)
-				pokemon.save()
-				print("Created Pokemon: " + national_number)
+					# Create the new Pokemon
+					pokemon = Pokemon(**data)
+					pokemon.save()
+					print("Created Pokemon: " + national_number)
 
 	# Import Forms
-	json_url = "https://birkoss.com/pokemon_forms.json"
-	r = Request(url=json_url, headers=headers)
+	if import_forms:
+		json_url = "https://birkoss.com/pokemon_forms.json"
+		r = Request(url=json_url, headers=headers)
 
-	with urllib.request.urlopen(r) as url:
-		pokemons = json.loads(url.read().decode())
-		for single_pokemon in pokemons:
-			pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
-			if len(pokemon) == 0:
-				data = {}
-				data['number'] = single_pokemon['number']
-				data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
-				for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
-					if mlid in single_pokemon:
-						data[mlid.replace("s/", "_")] = single_pokemon[mlid]
-				pokemon = Pokemon(**data)
-				pokemon.save();
-				print("Created Form: " + single_pokemon['number'])
+		with urllib.request.urlopen(r) as url:
+			pokemons = json.loads(url.read().decode())
+			for single_pokemon in pokemons:
+				pokemon = Pokemon.objects.filter(number=single_pokemon['number'])
+				if len(pokemon) == 0:
+					data = {}
+					data['number'] = single_pokemon['number']
+					data['variant'] = Pokemon.objects.filter(number=single_pokemon['national']).first()
+					for mlid in ('names/en', 'names/fr', 'names/jp', 'names/de', 'names/kr'):
+						if mlid in single_pokemon:
+							data[mlid.replace("s/", "_")] = single_pokemon[mlid]
+					pokemon = Pokemon(**data)
+					pokemon.save();
+					print("Created Form: " + single_pokemon['number'])
 
+	if import_regions:
+		json_url = "https://birkoss.com/pokemon_regions.json"
+		r = Request(url=json_url, headers=headers)
+
+		with urllib.request.urlopen(r) as url:
+			regions = json.loads(url.read().decode())
+			for single_region in regions:
+				region = Region.objects.filter(slug=single_region).first()
+				print(region)
+				if region != None:
+					for single_pokemon in regions[single_region]:
+						pokemon = Pokemon.objects.filter(number=single_pokemon['national']).first()
+						if pokemon != None:
+							pokemon_region = PokemonRegion.objects.filter(pokemon=pokemon, region=region).first()
+							if pokemon_region == None:
+								pokemon_region = PokemonRegion(pokemon=pokemon, region=region, number=single_pokemon['regional'])
+								pokemon_region.save()
+								print("Created regional: " + single_region + " #" + single_pokemon['regional'])
+					
 
 	return HttpResponse("<p>test2</p>")
 
