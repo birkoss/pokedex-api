@@ -10,11 +10,9 @@
 	{% endif %}
 	var AJAX_SINGLE_OPTION = "{% url 'pokemon_single_options' "0000" %}";
 	var AJAX_FILTER = "{% url 'user_filter' %}";
-	var AJAX_POKEMON_REGION = "{% if region %}{{ region }}{% endif %}";
 </script>
 
 {% if user.is_authenticated %}
-
 	<script type="text/javascript">
 		var AJAX_CSRF_TOKEN = "{{ csrf_token }}";
 	</script>
@@ -37,9 +35,14 @@
 	</div>
 {% endif %}
 
+<div class="content-header">
+	<div class="container-fluid">
+		<h1>Pokedex</h1>
+		<h6 class="total-pokemons"><span class="total">0000</span> pokemon(s)</h6>
+	</div>
+</div>
+
 <div class="container-fluid main-pokemons-list{% if 'is_owned' in request.session.hide %} filter-hide-is_owned{% endif %}{% if 'is_shiny' in request.session.hide %} filter-hide-is_shiny{% endif %}{% if 'is_pokeball' in request.session.hide %} filter-hide-is_pokeball{% endif %}{% if 'is_language' in request.session.hide %} filter-hide-is_language{% endif %}{% if 'is_original_trainer' in request.session.hide %} filter-hide-is_original_trainer{% endif %}{% if 'is_iv' in request.session.hide %} filter-hide-is_iv{% endif %}">
-	<h1 class="mt-4">Pokedex</h1>
-	<h1 class="mt-4 total-pokemons">0000</h1>
 
 	<div class="pokemons-grid">
 		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">

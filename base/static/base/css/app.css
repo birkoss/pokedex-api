@@ -67,7 +67,40 @@ a.nav-link.active {
 	text-decoration: underline;
 }
 
-/* Homepage Pokemons Grid */
+/* Archive */
+
+.content-header {
+	background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+	
+	padding: 10px 0;
+}
+
+.content-header > div {
+	display: flex;
+    justify-content: space-between;
+	align-items: center;
+}
+
+.content-header > div > * {
+	margin: 0;
+}
+
+.content-header .total-pokemons {
+	display: none;
+}
+
+@media screen and (max-width: 450px) {
+	.content-header > div h1 {
+		font-size: 1.5rem;
+	}
+}
+
+@media screen and (max-width: 412px) {
+	.main-pokemons-list {
+		padding: 0;
+	}
+}
 
 .pokemons-grid {
 	display: flex;
@@ -89,10 +122,17 @@ a.nav-link.active {
 }
 
 .pokemons-grid > .card.pokemon > .card-body {
+	width: 100%;
 	background-color: #fafafa;
 	text-align: center;
 	position: relative;
     padding: .75rem 1.25rem;
+}
+
+@media screen and (max-width: 360px) {
+	.pokemons-grid > .card.pokemon > .card-body {
+		padding: 0.75rem 1rem;
+	}
 }
 
 .pokemons-grid > .card.pokemon > .card-body .pokemon_number {

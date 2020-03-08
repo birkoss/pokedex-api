@@ -87,11 +87,13 @@ function load_pokemons_list() {
 		'type': "GET",
 		'url': AJAX_FIRST_PAGE,
 		'data': {
-			"region": AJAX_POKEMON_REGION
 		},
 		success: function(ret) {
 			jQuery(".pokemons-grid").html(ret['content']);
-			jQuery(".total-pokemons").html(ret['total']);
+
+			/* Update and show the total */
+			jQuery(".total-pokemons .total").html(ret['total']);
+			jQuery(".total-pokemons").show();
 
 			if (jQuery(".pagination-next").length) {
 				jQuery('.pokemons-grid').infiniteScroll({
