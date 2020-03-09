@@ -122,6 +122,7 @@ function load_pokemons_list() {
 			jQuery(".pokemons-grid").html(ret['content']);
 
 			/* Update and show the total */
+			jQuery(".total-pokemons .current_total").html(ret['current_total']);
 			jQuery(".total-pokemons .total").html(ret['total']);
 			jQuery(".total-pokemons").show();
 

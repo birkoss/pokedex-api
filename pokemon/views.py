@@ -262,8 +262,9 @@ def fetch_pokemons(**kwargs):
 	qs_values = ["name", "number", "variant__name", "variant__number"]
 
 	qs_filters = Q()
+	qs_filters_hidden = Q()
 
-	order_field = "number"
+	qs_order_by = "number"
 
 	# Dynamically add language for name and variant
 	for single_language in MODELTRANSLATION_LANGUAGES:
@@ -273,11 +274,11 @@ def fetch_pokemons(**kwargs):
 	if "pokemon_region" in kwargs and kwargs['pokemon_region'] != "":
 		qs_filters.add(Q(pokemonregion__region__slug=kwargs['pokemon_region']), Q.AND)
 		qs_values.append("pokemonregion__number")
-		order_field = "pokemonregion__number"
+		qs_order_by = "pokemonregion__number"
 
 	if "pokemon_hide" in kwargs:
 		for single_filter in kwargs['pokemon_hide']:
-			qs_filters.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
+			qs_filters_hidden.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
 
 	if "pokemon_type" in kwargs:
 		if kwargs['pokemon_type'] == "pokemons":
@@ -303,13 +304,12 @@ def fetch_pokemons(**kwargs):
 	print(qs_filters)
 
 	# Get the Pokemons depending on all the differents settings
-	pokemons_qs = Pokemon.objects.annotate(
-		**qs_annotate
-	).filter(
-		qs_filters
-	).select_related('variant').values(
-		*qs_values
-	).order_by(order_field)
+	pokemons_total_qs = get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by)
+	pokemons_qs = get_pokemon_queryset(qs_annotate, qs_filters & qs_filters_hidden, qs_values, qs_order_by)
+
+	print(".....")
+	print(len(pokemons_qs))
+
 	# Pagination
 	total_pokemons = 0;
 
@@ -356,8 +356,21 @@ def fetch_pokemons(**kwargs):
 	return {
 		"pokemons": pokemons_list,
 		"paginator": pokemons_paginator,
-		"total_pokemons": total_pokemons
+		"current_total_pokemons": total_pokemons,
+		"total_pokemons": len(pokemons_total_qs)
 	}
+
+
+def get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by):
+	pokemons_qs = Pokemon.objects.annotate(
+		**qs_annotate
+	).filter(
+		qs_filters
+	).select_related('variant').values(
+		*qs_values
+	).order_by(qs_order_by)
+
+	return pokemons_qs
 
 
 def fetch_page(request, page, page_url, **kwargs):
@@ -374,6 +387,7 @@ def fetch_page(request, page, page_url, **kwargs):
 	pokemons_data = fetch_pokemons(**kwargs)
 
 	page_content['total'] = pokemons_data['total_pokemons']
+	page_content['current_total'] = pokemons_data['current_total_pokemons']
 
 	print("Archive Queries")
 	print(connection.queries)
