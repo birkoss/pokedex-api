@@ -28,7 +28,7 @@ def pokemon_options(request, pokemon_number):
 
 		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
 
-		return render(request, "pokemon/options.html", {
+		return render(request, "pokemon/modal_filters.html", {
 			'pokemon': pokemon,
 			'options': pokemon_options
 		})
