@@ -16,22 +16,22 @@ function pokemon_show_modal(pokemon_number) {
 
 		/* Activate/Disable the SAVE button when options are changed */
 		jQuery("#pokemon-modal input[type='checkbox']").change(function() {
-			console.log("checkbox.change...");
-
+			/* If the is_owned filter is changed, we disable/enable the other filters */
 			var filter_id = jQuery(this).attr("id");
 			if (filter_id == "is_owned") {
 				modal_update_filters(jQuery(this).prop("checked"));
 			}
-			var current_modal_options = JSON.stringify(get_modal_options());
 
+			/* Disable/enable the SAVE button if the filters are not the same as the original filters the modal had */
+			var current_modal_options = JSON.stringify(get_modal_options());
 			jQuery("#pokemon-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
 		});
 	});
-
 	return false;
 }
 
 
+/* Disable/enable the other filters depending if is_owned is checked or not */
 function modal_update_filters(is_owned_checked) {
 	if (is_owned_checked) {
 		/* Enable all other filters */
