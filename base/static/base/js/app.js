@@ -111,6 +111,27 @@ function update_filter(name, value) {
 }
 
 
+function pokemon_update_total_status(pokedex_stats) {
+	var content = "";
+
+	console.log(pokedex_stats);
+
+	if (pokedex_stats['anonymous'] == 1) {
+		/* Unlogged status, only the total */
+		content = pokedex_stats['total'] + " Pokemon(s)";
+	} else {
+		/* Logged user without HIDE filter */
+		if (pokedex_stats['hide'] == 0) {
+			content = "Remaining: " + (pokedex_stats['total']-pokedex_stats['count_is_owned']) + " / " + pokedex_stats['total'] + " Pokemon(s)";
+		} else {
+			content = "Remaining: " + pokedex_stats['current'] + " / " + pokedex_stats['total'] + " Pokemon(s)";
+		}
+	}
+
+	jQuery(".total-pokemons-status").html(content).show();
+}
+
+
 /* Load the Pokemons list first page */
 function load_pokemons_list() {
 	jQuery.ajax({
@@ -122,9 +143,7 @@ function load_pokemons_list() {
 			jQuery(".pokemons-grid").html(ret['content']);
 
 			/* Update and show the total */
-			jQuery(".total-pokemons .current_total").html(ret['pokedex_stats']['current']);
-			jQuery(".total-pokemons .total").html(ret['pokedex_stats']['total']);
-			jQuery(".total-pokemons").show();
+			pokemon_update_total_status(ret['pokedex_stats'])
 
 			if (jQuery(".pagination-next").length) {
 				jQuery('.pokemons-grid').infiniteScroll({

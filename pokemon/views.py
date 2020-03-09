@@ -254,6 +254,14 @@ def import_pokemon(request):
 
 def fetch_pokemons(**kwargs):
 
+	# Those totals = current / total
+	pokedex_stats = {
+		'current': 0,
+		'total': 0,
+		'hide': 0,
+		'anonymous': 1
+	}
+
 	# @TODO: Remove hardcoding and make it dynamic from the model
 	pokemon_filters = ("is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender")
 
@@ -277,10 +285,6 @@ def fetch_pokemons(**kwargs):
 		qs_values.append("pokemonregion__number")
 		qs_order_by = "pokemonregion__number"
 
-	if "pokemon_hide" in kwargs:
-		for single_filter in kwargs['pokemon_hide']:
-			qs_filters_hidden.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
-
 	if "pokemon_type" in kwargs:
 		if kwargs['pokemon_type'] == "pokemons":
 			qs_filters.add(Q(variant__isnull=True), Q.AND)
@@ -302,15 +306,16 @@ def fetch_pokemons(**kwargs):
 			'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 		)
 
+		# Apply HIDE filters
+		if "pokemon_hide" in kwargs and len(kwargs['pokemon_hide']) > 0:
+			pokedex_stats['hide'] = 1
+			for single_filter in kwargs['pokemon_hide']:
+				qs_filters_hidden.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
+
 
 	# Get the Pokemons depending on all the differents settings
 	pokemons_qs = get_pokemon_queryset(qs_annotate, (qs_filters & qs_filters_hidden), qs_values, qs_order_by)
 
-	# Those totals = current / total
-	pokedex_stats = {
-		'current': 0,
-		'total': 0
-	}
 
 	# Pagination
 	pokemons_paginator = None
@@ -358,16 +363,18 @@ def fetch_pokemons(**kwargs):
 
 		# Add all the count of the filters 
 		for single_filter in pokemon_filters:
-			qs_aggregate['count_' + single_filter] = Count( Case(When(**{'userpokemon__'+single_filter: True}, then=Value(1))) )
+			qs_aggregate['count_' + single_filter] = Count(Case(When(**{'userpokemon__'+single_filter: True}, then=Value(1))))
+
 
 		pokemons_total_qs = get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by).aggregate(
 			**qs_aggregate
 		)
 
+		# Get all the values (from filters and the total)
+		pokedex_stats['anonymous'] = 0
 		pokedex_stats['total'] = pokemons_total_qs['total_pokemons']
-
-		print("total_QS")
-		print(pokemons_total_qs)
+		for single_filter in pokemon_filters:
+			pokedex_stats['count_' + single_filter] = pokemons_total_qs['count_' + single_filter]
 
 
 	return {
