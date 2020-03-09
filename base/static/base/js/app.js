@@ -1,5 +1,8 @@
 /* Use to keep the existing Modal Options when it's first open */
 var ORIGINAL_MODAL_OPTIONS = {};
+
+/* All the filters available in the modals */
+/* @TODO: Make this dynamic depending on the model */
 var POKEMON_FILTERS = ["is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender"];
 
 
