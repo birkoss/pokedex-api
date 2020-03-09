@@ -107,6 +107,10 @@ a.nav-link.active {
 	display: none;
 }
 
+.content-header .filters {
+	display: none;
+}
+
 @media screen and (max-width: 600px) {
 	.content-header > div h1 {
 		font-size: 2rem;

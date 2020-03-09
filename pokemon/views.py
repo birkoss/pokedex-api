@@ -399,15 +399,16 @@ def get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by):
 def fetch_page(request, page, page_url, **kwargs):
 
 	page_content = {
-		'content': "",
-		'total': 0
+		"content": "",
+		"filters_status": []
 	}
 
 	kwargs['pokemon_hide'] = request.session.get("hide", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user
-
 	pokemons_data = fetch_pokemons(**kwargs)
+
+	page_content['filters_status'] = kwargs['pokemon_hide']
 
 	page_content['pokedex_stats'] = pokemons_data['pokedex_stats']
 

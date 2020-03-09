@@ -38,6 +38,9 @@
 						<a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
 					</div>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#" onclick="return pokemon_show_modal();"><i class="fas fa-cog"></i></a>
+				</li>
 				{% else %}
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
@@ -50,6 +53,29 @@
 				{% endif %}
 			</ul>
 		</nav>
+
+		{% if user.is_authenticated %}
+			<script type="text/javascript">
+				var AJAX_CSRF_TOKEN = "{{ csrf_token }}";
+			</script>
+
+			<div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-title" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="app-modal-title">Options</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						</div>
+						<div class="modal-body">
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary btn-save">Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
 
 		{% block base %}{% endblock %}
 

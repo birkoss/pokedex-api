@@ -1,24 +1,59 @@
 /* Use to keep the existing Modal Options when it's first open */
 var ORIGINAL_MODAL_OPTIONS = {};
 
-/* All the filters available in the modals */
-/* @TODO: Make this dynamic depending on the model */
-var POKEMON_FILTERS = ["is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender"];
+/* All the filters available in the apps */
+var POKEMON_FILTERS = {
+	"is_owned": {
+		"name": "Owned",
+		"help": "Do you have this pokemon?",
+		"icon": "fas fa-check"
+	}, 
+	"is_shiny": {
+		"name": "Shiny",
+		"help": "Do you have this pokemon as a shiny?",
+		"icon": "fas fa-star"
+	}, 
+	"is_pokeball": {
+		"name": "Pokeball",
+		"help": "Do you have this pokemon in the correct Pokeball?",
+		"icon": "fas fa-dot-circle"
+	}, 
+	"is_language": {
+		"name": "Language",
+		"help": "Does this Pokemon is from the correct language?",
+		"icon": "fas fa-language"
+	}, 
+	"is_iv": {
+		"name": "IV",
+		"help": "Does this Pokemon have the correct IVs?",
+		"icon": "fas fa-dumbbell"
+	}, 
+	"is_original_trainer": {
+		"name": "Original Trainer",
+		"help": "Are you are the Original Trainer?",
+		"icon": "fas fa-user"
+	}, 
+	"is_gender": {
+		"name": "Gender",
+		"help": "Does this Pokemon has correct gender?",
+		"icon": "fas fa-venus-mars"
+	}
+};
 
 
 /* Load the options for this pokemon and show the modal */
 function pokemon_show_modal(pokemon_number) {
-	jQuery('#pokemon-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
-		jQuery('#pokemon-modal').modal({show:true});
+	jQuery('#app-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
+		jQuery('#app-modal').modal({show:true});
 		jQuery('[data-toggle="tooltip"]').tooltip();
-		jQuery("#pokemon-modal .btn-save").prop("disabled", true);
+		jQuery("#app-modal .btn-save").prop("disabled", true);
 
 		modal_update_filters(jQuery("#is_owned").prop("checked"));
 
 		ORIGINAL_MODAL_OPTIONS = JSON.stringify(get_modal_options());
 
 		/* Activate/Disable the SAVE button when options are changed */
-		jQuery("#pokemon-modal input[type='checkbox']").change(function() {
+		jQuery("#app-modal input[type='checkbox']").change(function() {
 			/* If the is_owned filter is changed, we disable/enable the other filters */
 			var filter_id = jQuery(this).attr("id");
 			if (filter_id == "is_owned") {
@@ -27,7 +62,7 @@ function pokemon_show_modal(pokemon_number) {
 
 			/* Disable/enable the SAVE button if the filters are not the same as the original filters the modal had */
 			var current_modal_options = JSON.stringify(get_modal_options());
-			jQuery("#pokemon-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
+			jQuery("#app-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
 		});
 	});
 	return false;
@@ -38,14 +73,14 @@ function pokemon_show_modal(pokemon_number) {
 function modal_update_filters(is_owned_checked) {
 	if (is_owned_checked) {
 		/* Enable all other filters */
-		POKEMON_FILTERS.forEach(function(single_filter) {
+		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 			if (single_filter != "is_owned") {
 				jQuery("#" + single_filter).prop("disabled", false);
 			}
 		});
 	} else {
 		/* Disable and uncheck all other filters */
-		POKEMON_FILTERS.forEach(function(single_filter) {
+		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 			if (single_filter != "is_owned") {
 				jQuery("#" + single_filter).prop("checked", false).prop("disabled", true);
 			}
@@ -75,7 +110,7 @@ function pokemon_save_options(pokemon_number, options, callback) {
 /* Get all the options (name and value) from the modal */
 function get_modal_options() {
 	modal_options = {};
-	jQuery("#pokemon-modal input[type='checkbox']").each(function() {
+	jQuery("#app-modal input[type='checkbox']").each(function() {
 		modal_options[ jQuery(this).attr("id") ] = jQuery(this).prop("checked");
 	});
 	return modal_options;
@@ -111,10 +146,9 @@ function update_filter(name, value) {
 }
 
 
+/* Update the pokedex status depending on the user data */
 function pokemon_update_total_status(pokedex_stats) {
 	var content = "";
-
-	console.log(pokedex_stats);
 
 	if (pokedex_stats['anonymous'] == 1) {
 		/* Unlogged status, only the total */
@@ -132,6 +166,27 @@ function pokemon_update_total_status(pokedex_stats) {
 }
 
 
+function pokemon_update_filters_status(filters) {
+	var content = "";
+
+	if (filters.length > 0) {
+		content += "Filters: ";
+		filters.forEach(function(single_filter) {
+			if (POKEMON_FILTERS[single_filter]) {
+				content += '<i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i> ' + POKEMON_FILTERS[single_filter]['name'] + " ";
+			}
+		});
+	}
+
+	jQuery(".content-header .filters").html(content);
+	if (content == "") {
+		jQuery(".content-header .filters").hide();
+	} else {
+		jQuery(".content-header .filters").show();
+	}
+}
+
+
 /* Load the Pokemons list first page */
 function load_pokemons_list() {
 	jQuery.ajax({
@@ -143,7 +198,9 @@ function load_pokemons_list() {
 			jQuery(".pokemons-grid").html(ret['content']);
 
 			/* Update and show the total */
-			pokemon_update_total_status(ret['pokedex_stats'])
+			pokemon_update_total_status(ret['pokedex_stats']);
+
+			pokemon_update_filters_status(ret['filters_status']);
 
 			if (jQuery(".pagination-next").length) {
 				jQuery('.pokemons-grid').infiniteScroll({
@@ -162,25 +219,25 @@ function load_pokemons_list() {
 
 jQuery(document).ready(function() {
 	/* Bind the SAVE button in the modal */
-	jQuery("#pokemon-modal .btn-save").click(function() {
+	jQuery("#app-modal .btn-save").click(function() {
 		/* Do NOT allow saving while it's already in process */
-		if (jQuery("#pokemon-modal .btn-save").prop("disabled")) {
+		if (jQuery("#app-modal .btn-save").prop("disabled")) {
 			return;
 		}
-		jQuery("#pokemon-modal .btn-save").prop("disabled", true).html("Saving...");
+		jQuery("#app-modal .btn-save").prop("disabled", true).html("Saving...");
 
 		/* Fetch all options from the modal */
 		var options = get_modal_options();
 
-		var pokemon_number = jQuery("#pokemon-modal input[name='pokemon_number']").val();
+		var pokemon_number = jQuery("#app-modal input[name='pokemon_number']").val();
 
 		/* Update all options for this pokemon */
 		pokemon_save_options(pokemon_number, options, function(ret) {
-			jQuery("#pokemon-modal .btn-save").prop("disabled", false).html("Save");
-			jQuery('#pokemon-modal').modal('hide');
+			jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
+			jQuery('#app-modal').modal('hide');
 
 			/* Activate the filter in the Pokemon card */
-			POKEMON_FILTERS.forEach(function(single_filter) {
+			Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 				if (options[single_filter] != undefined) {
 					if (options[single_filter]) {
 						jQuery(".container-pokemon-" + pokemon_number).addClass(single_filter.replace("_", "-"));
