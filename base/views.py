@@ -18,32 +18,28 @@ def user_logout(request):
 
 
 @login_required
-def user_filter(request):
-	cookie_name = request.POST.get("type", "")
-	cookie_value = request.POST.get("value", "")
+def user_filters(request):
+	if request.method == "POST":
+		cookie_name = request.POST.get("type", "")
+		cookie_values = request.POST.getlist("values[]", [])
 
-	response = {}
+		response = {}
 
-	if cookie_value == "" or cookie_name == "":
-		response['status'] = "error"
-		response['msg'] = "The filter and its value are mandatory!"
+		if cookie_name == "":
+			response['status'] = "error"
+			response['msg'] = "The filter and its values are mandatory!"
+			return JsonResponse(response)
+
+		request.session[cookie_name] = cookie_values
+
+		response['status'] = 'ok'
+
 		return JsonResponse(response)
-
-	session = request.session.get(cookie_name, [])
-
-	if cookie_value in session:
-		response['result'] = 'removed'
-		session.remove(cookie_value)
 	else:
-		response['result'] = 'added'
-		session.append(cookie_value)
-
-	request.session[cookie_name] = session
-
-	response['status'] = 'ok'
-
-	return JsonResponse(response)
-
+		pokemon_hide = request.session.get("hide", [])
+		return render(request, 'base/modal_filters.html', {
+			"hide": pokemon_hide
+		})
 
 @login_required
 def user_profile(request):

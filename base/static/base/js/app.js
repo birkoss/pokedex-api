@@ -41,9 +41,86 @@ var POKEMON_FILTERS = {
 };
 
 
+function show_modal_filters() {
+	jQuery('#app-modal .modal-body').load(AJAX_FILTERS, function() {
+
+		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {		
+			jQuery(".modal-filters").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
+		});
+
+		modal_filters.forEach(function(single_filter) {
+			jQuery(".modal-filters #" + single_filter).prop("checked", true);
+		});
+
+		ORIGINAL_MODAL_OPTIONS = JSON.stringify(get_modal_options());
+
+		jQuery("#app-modal input[type='checkbox']").change(function() {
+			/* Disable/enable the SAVE button if the filters are not the same as the original filters the modal had */
+			var current_modal_options = JSON.stringify(get_modal_options());
+			jQuery("#app-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
+		});
+
+		jQuery('#app-modal .modal-title').html("Filters");
+		jQuery('#app-modal').modal({show:true});
+		jQuery('[data-toggle="tooltip"]').tooltip();
+		jQuery("#app-modal .btn-save").prop("disabled", true);
+
+		/* Bind the SAVE button in the modal */
+		jQuery("#app-modal .btn-save").unbind("click").click(function() {
+			/* Do NOT allow saving while it's already in process */
+			if (jQuery("#app-modal .btn-save").prop("disabled")) {
+				return;
+			}
+			jQuery("#app-modal .btn-save").prop("disabled", true).html("Saving...");
+
+			var all_options = get_modal_options();
+
+			var new_options = [];
+			for (var single_option in all_options) {
+				if (all_options[single_option]) {
+					new_options.push(single_option);
+				}
+			}
+
+			console.log(new_options)
+
+			/* Update new filters */
+			jQuery.ajax({
+				type: "POST",
+				url: AJAX_FILTERS,
+				data: {
+					type: "hide",
+					values: new_options,
+					"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
+				},
+				success: function(ret) {
+					if (ret['status'] == "ok") {
+						if (ret['result'] == "added") {
+							//jQuery(".container-fluid.main-pokemons-list").addClass("filter-hide-" + value);
+							//jQuery("#layoutSidenav").addClass("filter-hide-" + value);
+						} else {
+							//jQuery(".container-fluid.main-pokemons-list").removeClass("filter-hide-" + value);
+							//jQuery("#layoutSidenav").removeClass("filter-hide-" + value);
+						}
+
+						jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
+						jQuery('#app-modal').modal('hide');
+
+						load_pokemons_list();
+					}
+				}
+			});
+
+		});
+	});
+	return false;
+}
+
+
 /* Load the options for this pokemon and show the modal */
 function pokemon_show_modal(pokemon_number) {
 	jQuery('#app-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
+		jQuery('#app-modal .modal-title').html("Options");
 		jQuery('#app-modal').modal({show:true});
 		jQuery('[data-toggle="tooltip"]').tooltip();
 		jQuery("#app-modal .btn-save").prop("disabled", true);
@@ -63,6 +140,37 @@ function pokemon_show_modal(pokemon_number) {
 			/* Disable/enable the SAVE button if the filters are not the same as the original filters the modal had */
 			var current_modal_options = JSON.stringify(get_modal_options());
 			jQuery("#app-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
+		});
+
+		/* Bind the SAVE button in the modal */
+		jQuery("#app-modal .btn-save").unbind("click").click(function() {
+			/* Do NOT allow saving while it's already in process */
+			if (jQuery("#app-modal .btn-save").prop("disabled")) {
+				return;
+			}
+			jQuery("#app-modal .btn-save").prop("disabled", true).html("Saving...");
+
+			/* Fetch all options from the modal */
+			var options = get_modal_options();
+
+			var pokemon_number = jQuery("#app-modal input[name='pokemon_number']").val();
+
+			/* Update all options for this pokemon */
+			pokemon_save_options(pokemon_number, options, function(ret) {
+				jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
+				jQuery('#app-modal').modal('hide');
+
+				/* Activate the filter in the Pokemon card */
+				Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
+					if (options[single_filter] != undefined) {
+						if (options[single_filter]) {
+							jQuery(".container-pokemon-" + pokemon_number).addClass(single_filter.replace("_", "-"));
+						} else {
+							jQuery(".container-pokemon-" + pokemon_number).removeClass(single_filter.replace("_", "-"));
+						}
+					}
+				});
+			});
 		});
 	});
 	return false;
@@ -85,7 +193,7 @@ function modal_update_filters(is_owned_checked) {
 				jQuery("#" + single_filter).prop("checked", false).prop("disabled", true);
 			}
 		});
-	}	
+	}
 }
 
 
@@ -121,7 +229,7 @@ function get_modal_options() {
 function update_filter(name, value) {
 	jQuery.ajax({
 		type: "POST",
-		url: AJAX_FILTER,
+		url: AJAX_FILTERS,
 		data: {
 			type: name,
 			value: value,
@@ -218,37 +326,6 @@ function load_pokemons_list() {
 
 
 jQuery(document).ready(function() {
-	/* Bind the SAVE button in the modal */
-	jQuery("#app-modal .btn-save").click(function() {
-		/* Do NOT allow saving while it's already in process */
-		if (jQuery("#app-modal .btn-save").prop("disabled")) {
-			return;
-		}
-		jQuery("#app-modal .btn-save").prop("disabled", true).html("Saving...");
-
-		/* Fetch all options from the modal */
-		var options = get_modal_options();
-
-		var pokemon_number = jQuery("#app-modal input[name='pokemon_number']").val();
-
-		/* Update all options for this pokemon */
-		pokemon_save_options(pokemon_number, options, function(ret) {
-			jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
-			jQuery('#app-modal').modal('hide');
-
-			/* Activate the filter in the Pokemon card */
-			Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
-				if (options[single_filter] != undefined) {
-					if (options[single_filter]) {
-						jQuery(".container-pokemon-" + pokemon_number).addClass(single_filter.replace("_", "-"));
-					} else {
-						jQuery(".container-pokemon-" + pokemon_number).removeClass(single_filter.replace("_", "-"));
-					}
-				}
-			});
-		});
-	});
-
 	/* Load the first Pokemon page */
 	if (jQuery(".main-pokemons-list").length) {
 		load_pokemons_list();

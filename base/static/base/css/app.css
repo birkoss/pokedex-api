@@ -269,6 +269,17 @@ body.logged-in .card.pokemon:not(.is-gender) .option-is_gender {
 	width: 50%;
 }
 
+/* Filters Modals */
+
+.modal-filters {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.modal-filters > .form-group {
+	width: 50%;
+}
+
 /* Sidebar */
 
 #collapseHidePokemons .fa-check {

@@ -1,0 +1,7 @@
+<script type="text/javascript">
+	var modal_filters = [];
+	{% for single_hide in hide %}
+		modal_filters.push('{{ single_hide }}');
+	{% endfor %}
+</script>
+<div class="modal-filters"></div>

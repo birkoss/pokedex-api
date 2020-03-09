@@ -28,7 +28,7 @@ urlpatterns = [
 	# Single Pokemon Options (for the modal) 
 	path('pokemon/<str:pokemon_number>/options', pokemon_views.pokemon_options, name='pokemon_single_options'),
 	
-	path('filter', base_views.user_filter, name='user_filter'),
+	path('filters', base_views.user_filters, name='user_filters'),
 	path('logout', base_views.user_logout, name='logout'),
 	path('profile', base_views.user_profile, name='user_profile'),
 
