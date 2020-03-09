@@ -300,6 +300,8 @@ def fetch_pokemons(**kwargs):
 				'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 			)
 
+	print(qs_filters)
+
 	# Get the Pokemons depending on all the differents settings
 	pokemons_qs = Pokemon.objects.annotate(
 		**qs_annotate
@@ -327,6 +329,7 @@ def fetch_pokemons(**kwargs):
 		pokemons_paginator = pokemons_qs
 		total_pokemons = len(pokemons_qs)
 
+	print(total_pokemons)
 
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
@@ -364,7 +367,7 @@ def fetch_page(request, page, page_url, **kwargs):
 		'total': 0
 	}
 
-	kwargs['hide'] = request.session.get("hide", [])
+	kwargs['pokemon_hide'] = request.session.get("hide", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user
 
