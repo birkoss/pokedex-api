@@ -98,20 +98,28 @@ def pokemon_options(request, pokemon_number):
 
 def pokemon_archive(request):
 	return render(request, "pokemon/archive.html", {
-		"page_url": "pokemon_archive_page"
+		"page_url": "pokemon_archive_page",
+		"page_title": "National Pokedex"
 	})
 
 
 def pokemon_forms_archive(request):
 	return render(request, "pokemon/archive.html", {
-		"page_url": "pokemon_forms_archive_page"
+		"page_url": "pokemon_forms_archive_page",
+		"page_title": "Alternate Forms"
 	})
 
 
 def pokemon_pokedex_archive(request, region=None):
+	single_region = Region.objects.filter(slug=region).first()
+
+	if single_region == None:
+		redirect('pokemon_archive')
+
 	return render(request, "pokemon/archive.html", {
 		"page_url": "pokemon_pokedex_archive_page",
-		"region": region
+		"region": region,
+		"page_title": "Pokemons from " + single_region.name
 	})
 
 

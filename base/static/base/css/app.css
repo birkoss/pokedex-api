@@ -48,6 +48,18 @@ nav.sb-sidenav.sb-sidenav-dark .sb-sidenav-menu .nav-link {
 	color: #ffffff;
 }
 
+.nav.navbar .navbar-brand {
+	order: 1;
+}
+
+.nav.navbar .navbar-brand {
+	order: 1;
+}
+
+.nav.navbar .navbar-brand {
+	order: 1;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #dc0a2d;
@@ -95,9 +107,15 @@ a.nav-link.active {
 	display: none;
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 600px) {
 	.content-header > div h1 {
-		font-size: 1.5rem;
+		font-size: 2rem;
+	}
+}
+
+@media screen and (max-width: 475px) {
+	.content-header > div h1 {
+		font-size: 1.2rem;
 	}
 }
 
