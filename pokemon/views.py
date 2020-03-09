@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import connection
-from django.db.models import FilteredRelation, Q
+from django.db.models import FilteredRelation, Q, Count, Case, When, Value
 from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -254,6 +254,7 @@ def import_pokemon(request):
 
 def fetch_pokemons(**kwargs):
 
+	# @TODO: Remove hardcoding and make it dynamic from the model
 	pokemon_filters = ("is_owned", "is_shiny", "is_pokeball", "is_language", "is_iv", "is_original_trainer", "is_gender")
 
 	pagination = 40
@@ -292,33 +293,31 @@ def fetch_pokemons(**kwargs):
 	if "variant__number" in kwargs:
 		qs_filters.add(Q(variant__number=kwargs['variant__number']), Q.AND)
 
-	if "user" in kwargs:
-		if kwargs['user'].is_authenticated:
-			for single_filter in pokemon_filters:
-				qs_values.append("t__" + single_filter)
+	# If logged in, left join with the UserPokemon data of that user
+	if "user" in kwargs and kwargs['user'].is_authenticated:
+		for single_filter in pokemon_filters:
+			qs_values.append("t__" + single_filter)
 
-			qs_annotate['t'] = FilteredRelation(
-				'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
-			)
+		qs_annotate['t'] = FilteredRelation(
+			'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
+		)
 
-	print(qs_filters)
 
 	# Get the Pokemons depending on all the differents settings
-	pokemons_total_qs = get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by)
-	pokemons_qs = get_pokemon_queryset(qs_annotate, qs_filters & qs_filters_hidden, qs_values, qs_order_by)
+	pokemons_qs = get_pokemon_queryset(qs_annotate, (qs_filters & qs_filters_hidden), qs_values, qs_order_by)
 
-	print(".....")
-	print(len(pokemons_qs))
+	# Those totals = current / total
+	pokedex_stats = {
+		'current': 0,
+		'total': 0
+	}
 
 	# Pagination
-	total_pokemons = 0;
-
-	print(kwargs)
-
 	pokemons_paginator = None
 	if "page" in kwargs and kwargs['page'] != None:
 		paginator = Paginator(pokemons_qs, pagination)
-		total_pokemons = paginator.count
+		pokedex_stats['current'] = paginator.count
+		pokedex_stats['total'] = paginator.count
 		try:
 			pokemons_paginator = paginator.page(kwargs['page'])
 		except PageNotAnInteger:
@@ -327,9 +326,7 @@ def fetch_pokemons(**kwargs):
 			pokemons_paginator = paginator.page(paginator.num_pages)
 	else:
 		pokemons_paginator = pokemons_qs
-		total_pokemons = len(pokemons_qs)
-
-	print(total_pokemons)
+		pokedex_stats['current'] = len(pokemons_qs)
 
 	pokemons_list = []
 	for single_pokemon in pokemons_paginator:
@@ -352,12 +349,31 @@ def fetch_pokemons(**kwargs):
 
 		pokemons_list.append(pokemon)
 
+	# If the user is logged in, get the total of filters
+	if "user" in kwargs and kwargs['user'].is_authenticated:
+		# Will hold the number of Pokemons matching all those filters (except HIDE)
+		qs_aggregate = {
+			'total_pokemons': Count('id', distinct=True)
+		}
+
+		# Add all the count of the filters 
+		for single_filter in pokemon_filters:
+			qs_aggregate['count_' + single_filter] = Count( Case(When(**{'userpokemon__'+single_filter: True}, then=Value(1))) )
+
+		pokemons_total_qs = get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by).aggregate(
+			**qs_aggregate
+		)
+
+		pokedex_stats['total'] = pokemons_total_qs['total_pokemons']
+
+		print("total_QS")
+		print(pokemons_total_qs)
+
 
 	return {
 		"pokemons": pokemons_list,
 		"paginator": pokemons_paginator,
-		"current_total_pokemons": total_pokemons,
-		"total_pokemons": len(pokemons_total_qs)
+		"pokedex_stats": pokedex_stats
 	}
 
 
@@ -386,8 +402,7 @@ def fetch_page(request, page, page_url, **kwargs):
 
 	pokemons_data = fetch_pokemons(**kwargs)
 
-	page_content['total'] = pokemons_data['total_pokemons']
-	page_content['current_total'] = pokemons_data['current_total_pokemons']
+	page_content['pokedex_stats'] = pokemons_data['pokedex_stats']
 
 	print("Archive Queries")
 	print(connection.queries)
