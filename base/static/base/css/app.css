@@ -67,6 +67,11 @@ a.nav-link.active {
 	text-decoration: underline;
 }
 
+/* Disabled checkbox */
+.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
+    color: #cccccc;
+}
+
 /* Archive */
 
 .content-header {

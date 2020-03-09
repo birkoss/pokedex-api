@@ -10,10 +10,18 @@ function pokemon_show_modal(pokemon_number) {
 		jQuery('[data-toggle="tooltip"]').tooltip();
 		jQuery("#pokemon-modal .btn-save").prop("disabled", true);
 
+		modal_update_filters(jQuery("#is_owned").prop("checked"));
+
 		ORIGINAL_MODAL_OPTIONS = JSON.stringify(get_modal_options());
 
 		/* Activate/Disable the SAVE button when options are changed */
 		jQuery("#pokemon-modal input[type='checkbox']").change(function() {
+			console.log("checkbox.change...");
+
+			var filter_id = jQuery(this).attr("id");
+			if (filter_id == "is_owned") {
+				modal_update_filters(jQuery(this).prop("checked"));
+			}
 			var current_modal_options = JSON.stringify(get_modal_options());
 
 			jQuery("#pokemon-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
@@ -21,6 +29,25 @@ function pokemon_show_modal(pokemon_number) {
 	});
 
 	return false;
+}
+
+
+function modal_update_filters(is_owned_checked) {
+	if (is_owned_checked) {
+		/* Enable all other filters */
+		POKEMON_FILTERS.forEach(function(single_filter) {
+			if (single_filter != "is_owned") {
+				jQuery("#" + single_filter).prop("disabled", false);
+			}
+		});
+	} else {
+		/* Disable and uncheck all other filters */
+		POKEMON_FILTERS.forEach(function(single_filter) {
+			if (single_filter != "is_owned") {
+				jQuery("#" + single_filter).prop("checked", false).prop("disabled", true);
+			}
+		});
+	}	
 }
 
 
