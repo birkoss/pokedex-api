@@ -7,3 +7,4 @@ tmp/
 passenger_wsgi.py
 project/config.py
 stderr.log
+todo.txt
