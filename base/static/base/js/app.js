@@ -182,7 +182,7 @@ function pokemon_show_modal(pokemon_number) {
 			/* Fetch all options from the modal */
 			var options = get_modal_options();
 
-			var pokemon_number = jQuery("#app-modal input[name='pokemon_number']").val();
+			var pokemon_number = jQuery("#app-modal .pokemon-options").data("pokemon-number");
 
 			/* Update all options for this pokemon */
 			pokemon_save_options(pokemon_number, options, function(ret) {
