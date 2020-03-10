@@ -269,33 +269,7 @@ body.logged-in .card.pokemon:not(.is-gender) .option-is_gender {
 	width: 50%;
 }
 
-/* Filters Modals */
-
-.app-filters {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.app-filters > .form-group {
-	width: 50%;
-}
-
-/* Sidebar */
-
-#collapseHidePokemons .fa-check {
-	display: none;
-	margin-right: 10px;
-}
-
-#layoutSidenav.filter-hide-is_shiny #collapseHidePokemons a.is-shiny .fa-check,
-#layoutSidenav.filter-hide-is_owned #collapseHidePokemons a.is-owned .fa-check,
-#layoutSidenav.filter-hide-is_language #collapseHidePokemons a.is-language .fa-check,
-#layoutSidenav.filter-hide-is_pokeball #collapseHidePokemons a.is-pokeball .fa-check,
-#layoutSidenav.filter-hide-is_iv #collapseHidePokemons a.is-iv .fa-check,
-#layoutSidenav.filter-hide-is_original_trainer #collapseHidePokemons a.is-original-trainer .fa-check,
-#layoutSidenav.filter-hide-is_gender #collapseHidePokemons a.is-gender .fa-check {
-	display: inline-block;
-}
+/* Container */
 
 .container-fluid.main-pokemons-list.filter-hide-is_owned .card.pokemon.is-owned,
 .container-fluid.main-pokemons-list.filter-hide-is_shiny .card.pokemon.is-shiny,
