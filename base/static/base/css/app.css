@@ -196,6 +196,12 @@ a.nav-link.active {
     }
 }
 
+/* Navbar */
+
+.dropdown-language a .fa-check {
+	display: none;
+}
+
 /* User Profile */
 
 .user-profile .social-media:not(:first-child) {

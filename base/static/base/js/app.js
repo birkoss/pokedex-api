@@ -42,6 +42,23 @@ var POKEMON_FILTERS = {
 
 var INFINITE_SCROLL = null;
 
+
+function change_language(new_language) {
+	jQuery.ajax({
+		type: "POST",
+		url: AJAX_FILTERS,
+		data: {
+			type: "language",
+			value: new_language,
+			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
+		},
+		success: function(ret) {
+			ajax_refresh_pokemons();
+		}
+	});
+}
+
+
 /* Get all the options (name and value) from the modal */
 function modal_get_options() {
 	modal_options = {};
@@ -289,6 +306,10 @@ function ajax_refresh_pokemons() {
 
 			/* Update and show the filters status (if any) */
 			status_update_filters(ret['filters_status']);
+
+			/* Update language in the dropdown */
+			jQuery(".dropdown-language .fa-check").hide();
+			jQuery(".dropdown-language .lang-" + ret['pokemon_language'] + " .fa-check").show();
 
 			/* Setup the infinite scroll if any pagination is present */
 			if (jQuery(".pagination-next").length) {

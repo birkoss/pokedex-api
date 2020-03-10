@@ -20,19 +20,27 @@ def user_logout(request):
 @login_required
 def user_filters(request):
 	if request.method == "POST":
-		cookie_name = request.POST.get("type", "")
-		cookie_values = request.POST.getlist("values[]", [])
+		setting_name = request.POST.get("type", "")
+		setting_value = ""
+
+		if 'values' in request.POST:
+			setting_value = request.POST.getlist("values[]", [])
+		else:
+			setting_value = request.POST.get("value", "")
 
 		response = {}
 
-		if cookie_name == "":
+		if setting_name == "":
 			response['status'] = "error"
 			response['msg'] = "The filter and its values are mandatory!"
 			return JsonResponse(response)
 
-		request.session[cookie_name] = cookie_values
+		request.session[setting_name] = setting_value
 
 		response['status'] = 'ok'
+
+		print(setting_name + " = " + setting_value)
+		print(request.session['language'])
 
 		return JsonResponse(response)
 	else:

@@ -419,6 +419,7 @@ def fetch_page(request, page, page_url, **kwargs):
 	page_content['filters_status'] = kwargs['pokemon_hide']
 
 	page_content['pokedex_stats'] = pokemons_data['pokedex_stats']
+	page_content['pokemon_language'] = request.session['language']
 
 	print("Archive Queries")
 	print(connection.queries)
