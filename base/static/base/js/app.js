@@ -40,6 +40,7 @@ var POKEMON_FILTERS = {
 	}
 };
 
+var INFINITE_SCROLL = null;
 
 /* Get all the options (name and value) from the modal */
 function modal_get_options() {
@@ -291,7 +292,11 @@ function ajax_refresh_pokemons() {
 
 			/* Setup the infinite scroll if any pagination is present */
 			if (jQuery(".pagination-next").length) {
-				jQuery('.pokemons-grid').infiniteScroll({
+				if (INFINITE_SCROLL != null) {
+					jQuery('.pokemons-grid').infiniteScroll("destroy");
+					INFINITE_SCROLL = null;
+				}
+				INFINITE_SCROLL = jQuery('.pokemons-grid').infiniteScroll({
 					path: '.pagination-next',
 					append: '.card.pokemon',
 					history: 'none',
