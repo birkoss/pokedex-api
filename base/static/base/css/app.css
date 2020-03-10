@@ -117,7 +117,10 @@ a.nav-link.active {
 	}
 }
 
-@media screen and (max-width: 475px) {
+@media screen and (max-width: 525px) {
+	.total-pokemons-status > span {
+		display: none;
+	}
 	.content-header > div h1 {
 		font-size: 1.2rem;
 	}
@@ -126,6 +129,18 @@ a.nav-link.active {
 @media screen and (max-width: 412px) {
 	.main-pokemons-list {
 		padding: 0;
+	}
+}
+
+@media screen and (max-width: 380px) {
+	.navbar-brand {
+		font-size: 1rem;
+	}
+}
+
+@media screen and (max-width: 320px) {
+	.navbar-brand {
+		font-size: 0.75rem;
 	}
 }
 
