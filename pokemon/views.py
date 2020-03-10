@@ -346,11 +346,21 @@ def fetch_pokemons(**kwargs):
 		pokemon = single_pokemon
 		pokemon['visible_number'] = pokemon['number'][:3]
 
+		if 'pokemon_language' in kwargs and kwargs['pokemon_language'] != "en":
+			translated_name = pokemon['name_' + kwargs['pokemon_language']]
+			if translated_name != "":
+				pokemon['name'] = translated_name
+
 		if 'pokemonregion__number' in single_pokemon and single_pokemon['pokemonregion__number'] != None:
 			pokemon['visible_number'] = single_pokemon['pokemonregion__number'][:3]
 
 		if single_pokemon['variant__name'] != None:
-			pokemon['name'] = single_pokemon['name'].replace("#NAME#", single_pokemon['variant__name'])
+			variant_name = single_pokemon['variant__name']
+			if 'pokemon_language' in kwargs and kwargs['pokemon_language'] != "en":
+				translated_name = pokemon['variant__name_' + kwargs['pokemon_language']]
+				if translated_name != "":
+					variant_name = translated_name
+			pokemon['name'] = single_pokemon['name'].replace("#NAME#", variant_name)
 
 		# Init filters to default values
 		for single_filter in pokemon_filters:
@@ -414,12 +424,13 @@ def fetch_page(request, page, page_url, **kwargs):
 	kwargs['pokemon_hide'] = request.session.get("hide", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user
+	kwargs['pokemon_language'] = request.session.get("language", "en")
 	pokemons_data = fetch_pokemons(**kwargs)
 
 	page_content['filters_status'] = kwargs['pokemon_hide']
+	page_content['pokemon_language'] = kwargs['pokemon_language']
 
 	page_content['pokedex_stats'] = pokemons_data['pokedex_stats']
-	page_content['pokemon_language'] = request.session['language']
 
 	print("Archive Queries")
 	print(connection.queries)
