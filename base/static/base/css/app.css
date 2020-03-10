@@ -271,12 +271,12 @@ body.logged-in .card.pokemon:not(.is-gender) .option-is_gender {
 
 /* Filters Modals */
 
-.modal-filters {
+.app-filters {
 	display: flex;
 	flex-wrap: wrap;
 }
 
-.modal-filters > .form-group {
+.app-filters > .form-group {
 	width: 50%;
 }
 

@@ -40,17 +40,25 @@ var POKEMON_FILTERS = {
 	}
 };
 
-
 function show_modal_filters() {
 	jQuery('#app-modal .modal-body').load(AJAX_FILTERS, function() {
 
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {		
-			jQuery(".modal-filters").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
+			jQuery(".app-filters").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
 		});
 
-		modal_filters.forEach(function(single_filter) {
-			jQuery(".modal-filters #" + single_filter).prop("checked", true);
-		});
+		/* Get the current options in the modal */
+		try {
+			var modal_options = jQuery("#app-modal .app-filters").data("filters").replace(/'/g, '"');
+
+			/* Check the options */
+			current_options = JSON.parse(modal_options);
+			JSON.parse(modal_options).forEach(function(single_option) {
+				jQuery("#app-modal #" + single_option).prop("checked", true);
+			});
+		} catch(err) {
+			/* @TODO: Add a warning to prevent the user the options were not loaded correctly */
+		}
 
 		ORIGINAL_MODAL_OPTIONS = JSON.stringify(get_modal_options());
 
@@ -121,12 +129,12 @@ function show_modal_filters() {
 function pokemon_show_modal(pokemon_number) {
 	jQuery('#app-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
 
-		/* Create all options in the popup */
+		/* Create all options in the modal */
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {		
 			jQuery("#app-modal .pokemon-options").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" title="' + POKEMON_FILTERS[single_filter]['help'] + '" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
 		});
 
-		/* Get the current options in the popup */
+		/* Get the current options in the modal */
 		try {
 			var modal_options = jQuery("#app-modal .pokemon-options").data("options").replace(/'/g, '"');
 

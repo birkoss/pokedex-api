@@ -38,7 +38,7 @@ def user_filters(request):
 	else:
 		pokemon_hide = request.session.get("hide", [])
 		return render(request, 'base/modal_filters.html', {
-			"hide": pokemon_hide
+			"current_filters": pokemon_hide
 		})
 
 @login_required
