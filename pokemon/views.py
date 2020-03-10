@@ -26,11 +26,19 @@ def pokemon_options(request, pokemon_number):
 
 		pokemon = Pokemon.objects.filter(number=pokemon_number).first()
 
-		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
+		current_options = []
 
-		return render(request, "pokemon/modal_filters.html", {
+		# Get all enabled options for this pokemon and this user
+		pokemon_options = UserPokemon.objects.filter(pokemon=pokemon, user=request.user).first()
+		if pokemon_options != None:
+			for single_field in pokemon_options._meta.get_fields():
+				if single_field.name[0:3] == "is_" and getattr(pokemon_options, single_field.name) == True:
+					current_options.append(single_field.name)
+
+		return render(request, "pokemon/modal_options.html", {
 			'pokemon': pokemon,
-			'options': pokemon_options
+			'current_options': current_options,
+			'current_options_json': json.dumps(current_options)
 		})
 
 	if request.method == "POST":

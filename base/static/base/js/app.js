@@ -73,24 +73,23 @@ function show_modal_filters() {
 			}
 			jQuery("#app-modal .btn-save").prop("disabled", true).html("Saving...");
 
-			var all_options = get_modal_options();
+			var all_filters = get_modal_options();
 
-			var new_options = [];
-			for (var single_option in all_options) {
-				if (all_options[single_option]) {
-					new_options.push(single_option);
+			/* Get only the checked filters to save them */
+			var new_filters = [];
+			for (var single_option in all_filters) {
+				if (all_filters[single_option]) {
+					new_filters.push(single_option);
 				}
 			}
 
-			console.log(new_options)
-
-			/* Update new filters */
+			/* Save checked filters */
 			jQuery.ajax({
 				type: "POST",
 				url: AJAX_FILTERS,
 				data: {
 					type: "hide",
-					values: new_options,
+					values: new_filters,
 					"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
 				},
 				success: function(ret) {
@@ -113,6 +112,7 @@ function show_modal_filters() {
 
 		});
 	});
+
 	return false;
 }
 
@@ -120,13 +120,34 @@ function show_modal_filters() {
 /* Load the options for this pokemon and show the modal */
 function pokemon_show_modal(pokemon_number) {
 	jQuery('#app-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
+
+		/* Create all options in the popup */
+		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {		
+			jQuery("#app-modal .pokemon-options").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" title="' + POKEMON_FILTERS[single_filter]['help'] + '" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
+		});
+
+		/* Get the current options in the popup */
+		try {
+			var modal_options = jQuery("#app-modal .pokemon-options").data("options").replace(/'/g, '"');
+
+			/* Check the options */
+			current_options = JSON.parse(modal_options);
+			JSON.parse(modal_options).forEach(function(single_option) {
+				jQuery("#app-modal #" + single_option).prop("checked", true);
+			});
+		} catch(err) {
+			/* @TODO: Add a warning to prevent the user the options were not loaded correctly */
+		}
+
 		jQuery('#app-modal .modal-title').html("Options");
 		jQuery('#app-modal').modal({show:true});
-		jQuery('[data-toggle="tooltip"]').tooltip();
+		jQuery('#app-modal [data-toggle="tooltip"]').tooltip();
 		jQuery("#app-modal .btn-save").prop("disabled", true);
 
+		/* Update filters if the is_owned is checked */
 		modal_update_filters(jQuery("#is_owned").prop("checked"));
 
+		/* Save the original options */
 		ORIGINAL_MODAL_OPTIONS = JSON.stringify(get_modal_options());
 
 		/* Activate/Disable the SAVE button when options are changed */
