@@ -92,30 +92,14 @@ function show_modal_filters() {
 				}
 			}
 
+
 			/* Save checked filters */
-			jQuery.ajax({
-				type: "POST",
-				url: AJAX_FILTERS,
-				data: {
-					type: "hide",
-					values: new_filters,
-					"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
-				},
-				success: function(ret) {
-					if (ret['status'] == "ok") {
-						if (ret['result'] == "added") {
-							//jQuery(".container-fluid.main-pokemons-list").addClass("filter-hide-" + value);
-							//jQuery("#layoutSidenav").addClass("filter-hide-" + value);
-						} else {
-							//jQuery(".container-fluid.main-pokemons-list").removeClass("filter-hide-" + value);
-							//jQuery("#layoutSidenav").removeClass("filter-hide-" + value);
-						}
+			save_options(new_filters, function(ret) {
+				if (ret['status'] == "ok") {
+					jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
+					jQuery('#app-modal').modal('hide');
 
-						jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
-						jQuery('#app-modal').modal('hide');
-
-						load_pokemons_list();
-					}
+					load_pokemons_list();
 				}
 			});
 
@@ -227,6 +211,22 @@ function modal_update_filters(is_owned_checked) {
 }
 
 
+function save_options(options, callback) {
+	jQuery.ajax({
+		type: "POST",
+		url: AJAX_FILTERS,
+		data: {
+			type: "hide",
+			values: options,
+			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
+		},
+		success: function(ret) {
+			callback(ret);
+		}
+	});
+}
+
+
 /* Save the options for this Pokemon */
 function pokemon_save_options(pokemon_number, options, callback) {
 	jQuery.ajax({
@@ -240,6 +240,15 @@ function pokemon_save_options(pokemon_number, options, callback) {
 			if (callback != undefined) {
 				callback(ret);
 			}
+		}
+	});
+}
+
+
+function clear_filters() {
+	save_options([], function(ret) {
+		if (ret['status'] == "ok") {
+			load_pokemons_list();
 		}
 	});
 }
@@ -314,6 +323,7 @@ function pokemon_update_filters_status(filters) {
 				content += '<i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i> ' + POKEMON_FILTERS[single_filter]['name'] + " ";
 			}
 		});
+		content += ' <a href="#" onclick="return clear_filters();">Reset</a>';
 	}
 
 	jQuery(".content-header .filters").html(content);
