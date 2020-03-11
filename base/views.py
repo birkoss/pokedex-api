@@ -23,10 +23,10 @@ def user_filters(request):
 		setting_name = request.POST.get("type", "")
 		setting_value = ""
 
-		if 'values' in request.POST:
-			setting_value = request.POST.getlist("values[]", [])
-		else:
+		if 'value' in request.POST:
 			setting_value = request.POST.get("value", "")
+		else:
+			setting_value = request.POST.getlist("values[]", [])
 
 		response = {}
 
@@ -38,9 +38,6 @@ def user_filters(request):
 		request.session[setting_name] = setting_value
 
 		response['status'] = 'ok'
-
-		print(setting_name + " = " + setting_value)
-		print(request.session['language'])
 
 		return JsonResponse(response)
 	else:
