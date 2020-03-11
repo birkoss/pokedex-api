@@ -269,7 +269,7 @@ def fetch_pokemons(**kwargs):
 	pokedex_stats = {
 		'current': 0,
 		'total': 0,
-		'hide': 0,
+		'filters': 0,
 		'anonymous': 1
 	}
 
@@ -317,10 +317,10 @@ def fetch_pokemons(**kwargs):
 			'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 		)
 
-		# Apply HIDE filters
-		if "pokemon_hide" in kwargs and len(kwargs['pokemon_hide']) > 0:
-			pokedex_stats['hide'] = 1
-			for single_filter in kwargs['pokemon_hide']:
+		# Apply settings filters
+		if "settings_filters" in kwargs and len(kwargs['settings_filters']) > 0:
+			pokedex_stats['filters'] = 1
+			for single_filter in kwargs['settings_filters']:
 				qs_filters_hidden.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
 
 
@@ -377,7 +377,7 @@ def fetch_pokemons(**kwargs):
 
 	# If the user is logged in, get the total of filters
 	if "user" in kwargs and kwargs['user'].is_authenticated:
-		# Will hold the number of Pokemons matching all those filters (except HIDE)
+		# Will hold the number of Pokemons matching all those filters (except filtered one)
 		qs_aggregate = {
 			'total_pokemons': Count('id', distinct=True)
 		}
@@ -424,13 +424,13 @@ def fetch_page(request, page, page_url, **kwargs):
 		"filters_status": []
 	}
 
-	kwargs['pokemon_hide'] = request.session.get("filters", [])
+	kwargs['settings_filters'] = request.session.get("filters", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user
 	kwargs['pokemon_language'] = request.session.get("language", "en")
 	pokemons_data = fetch_pokemons(**kwargs)
 
-	page_content['filters_status'] = kwargs['pokemon_hide']
+	page_content['filters_status'] = kwargs['settings_filters']
 	page_content['pokemon_language'] = kwargs['pokemon_language']
 
 	page_content['pokedex_stats'] = pokemons_data['pokedex_stats']

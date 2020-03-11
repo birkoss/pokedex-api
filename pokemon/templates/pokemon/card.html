@@ -1,5 +1,5 @@
 {% for pokemon in pokemons %}
-	<div class="card pokemon container-pokemon-{{ pokemon.number }}">
+	<div class="card pokemon container-pokemon-{{ pokemon.number }}{% if is_logged %}{% if pokemon.is_owned %} is-owned{% endif %}{% if pokemon.is_shiny %} is-shiny{% endif %}{% if pokemon.is_pokeball %} is-pokeball{% endif %}{% if pokemon.is_language %} is-language{% endif %}{% if pokemon.is_iv %} is-iv{% endif %}{% if pokemon.is_original_trainer %} is-original-trainer{% endif %}{% if pokemon.is_gender %} is-gender{% endif %}{% endif %}">
 		<a href="{% url 'pokemon_single' pokemon.number %}" class="card-img-top pokemon-sprite pokemon-{{ pokemon.number }}"></a>
 		<div class="card-body">
 			<p class="pokemon_number">{{ pokemon.visible_number }}</p>

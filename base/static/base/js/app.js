@@ -266,8 +266,8 @@ function status_update_pokedex_stats(pokedex_stats) {
 		/* Unlogged status, only the total */
 		content = pokedex_stats['total'] + " Pokemon(s)";
 	} else {
-		/* Logged user without HIDE filter */
-		if (pokedex_stats['hide'] == 0) {
+		/* Logged user without filters */
+		if (pokedex_stats['filters'] == 0) {
 			content = "<span class='prefix'>Remaining: </span>" + (pokedex_stats['total']-pokedex_stats['count_is_owned']) + " / " + pokedex_stats['total'] + "<span class='suffix'> Pokemon(s)</span>";
 		} else {
 			content = "<span class='prefix'>Remaining: </span>" + pokedex_stats['current'] + " / " + pokedex_stats['total'] + "<span class='suffix'> Pokemon(s)</span>";
