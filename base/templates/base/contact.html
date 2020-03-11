@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+
+{% block page_title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container user-profile">
+	<div class="row justify-content-center">
+		<div class="col-lg-5">
+			<div class="card shadow-lg border-0 rounded-lg mt-5">
+				<div class="card-header"><h3 class="text-center font-weight-light my-4">Contact</h3></div>
+				<div class="card-body">
+					<div class="small mb-3 text-muted">Email</div>
+					<p>You can contact me at <a href="mailto:admin@birkoss.com">admin@birkoss.com</a> and I'll answer you within 24 hours.</p>
+					
+					<div class="small mb-3 text-muted">GitHub</div>
+					<p>If you have a GitHub account and you found a bug, or wish to help me add features, you can access this app <a href="https://github.com/birkoss/pokedex-api" target="_blank">source code</a>.</p>
+
+				</div>
+				<div class="card-footer text-center">
+					<div class="small"><a href="{% url 'pokemon_archive' %}">Back to the Pokemons</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

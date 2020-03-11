@@ -31,6 +31,8 @@ urlpatterns = [
 	path('filters', base_views.user_filters, name='user_filters'),
 	path('logout', base_views.user_logout, name='logout'),
 	path('profile', base_views.user_profile, name='user_profile'),
+	
+	path('contact', base_views.contact, name='contact'),
 
 	path('import', pokemon_views.import_pokemon, name='import'),
 	

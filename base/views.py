@@ -10,6 +10,10 @@ def error_404(request, exception=None):
 	return render(request, 'base/404.html')
 
 
+def contact(request):
+	return render(request, 'base/contact.html')
+
+
 @login_required
 def user_logout(request):
 	logout(request)
@@ -45,6 +49,7 @@ def user_filters(request):
 		return render(request, 'base/modal_filters.html', {
 			"current_filters": pokemon_hide
 		})
+
 
 @login_required
 def user_profile(request):
