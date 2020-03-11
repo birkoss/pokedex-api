@@ -2,11 +2,21 @@
 
 {% block content %}
 <div class="container-fluid">
-	<h1 class="mt-4">{{ pokemon.name }}</h1>
+	<h1 class="mt-4">{{ pokemon.number }} - {{ pokemon.name }}</h1>
 	<div class="card mb-4">
 		<div class="card-header"><i class="fas fa-table mr-1"></i>Options</div>
 		<div class="card-body">...</div>
 	</div>
+	{% if regions %}
+	<div class="card mb-4">
+		<div class="card-header"><i class="fas fa-table mr-1"></i>Regions</div>
+		<div class="card-body">
+			{% for region in regions %}
+			<a href="{% url 'pokemon_pokedex_archive' region.region.slug %}">{{ region.region.name }} #{{ region.number }}</a><br />
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
 	{% if variants %}
 		<div class="card mb-4">
 			<div class="card-header"><i class="fas fa-table mr-1"></i>Variants</div>

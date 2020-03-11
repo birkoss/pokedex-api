@@ -182,9 +182,12 @@ def pokemon_single(request, pokemon_number=None):
 	else:
 		variants_data = fetch_pokemons(user=request.user, pokemon_number=pokemons_data['pokemons'][0]['variant__number'])
 
+	regions = PokemonRegion.objects.filter(pokemon__number=pokemons_data['pokemons'][0]['number']).select_related("region")
+
 	return render(request, "pokemon/single.html", {
 		'pokemon': pokemons_data['pokemons'][0],
-		'variants': variants_data['pokemons']
+		'variants': variants_data['pokemons'],
+		"regions": regions
 	})
 
 
