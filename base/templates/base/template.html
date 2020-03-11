@@ -32,25 +32,12 @@
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" id="user-dropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
 					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown">
-						<a class="dropdown-item" href="#" onclick="return modal_show_options();">Language</a>
+						<a class="dropdown-item" href="#" onclick="return modal_show_options();">Settings</a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
 					</div>
-				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" id="language-dropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-language fa-fw"></i></a>
-					<div class="dropdown-menu dropdown-menu-right dropdown-language" aria-labelledby="language-dropdown">
-						<a class="dropdown-item lang-en" href="#" onclick="return change_language('en');">English <i class="fas fa-check"></i></a>
-						<a class="dropdown-item lang-fr" href="#" onclick="return change_language('fr');">French <i class="fas fa-check"></i></a>
-						<a class="dropdown-item lang-de" href="#" onclick="return change_language('de');">German <i class="fas fa-check"></i></a>
-						<a class="dropdown-item lang-kr" href="#" onclick="return change_language('kr');">Korean <i class="fas fa-check"></i></a>
-						<a class="dropdown-item lang-jp" href="#" onclick="return change_language('jp');">Japanese <i class="fas fa-check"></i></a>
-					</div>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#" onclick="return modal_show_options();"><i class="fas fa-filter"></i></a>
 				</li>
 				{% else %}
 				<li class="nav-item dropdown">
