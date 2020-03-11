@@ -43,6 +43,7 @@ var POKEMON_FILTERS = {
 var INFINITE_SCROLL = null;
 
 
+/* Change the current language and refresh the Pokemons */
 function change_language(new_language) {
 	jQuery.ajax({
 		type: "POST",
@@ -120,7 +121,6 @@ function modal_show_options() {
 					new_filters.push(single_option);
 				}
 			}
-
 
 			/* Save checked filters */
 			ajax_save_options(new_filters, function(ret) {
@@ -204,15 +204,7 @@ function modal_show_pokemon_options(pokemon_number) {
 				jQuery('#app-modal').modal('hide');
 
 				/* Activate the filter in the Pokemon card */
-				Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
-					if (options[single_filter] != undefined) {
-						if (options[single_filter]) {
-							jQuery(".container-pokemon-" + pokemon_number).addClass(single_filter.replace("_", "-"));
-						} else {
-							jQuery(".container-pokemon-" + pokemon_number).removeClass(single_filter.replace("_", "-"));
-						}
-					}
-				});
+				ajax_refresh_pokemons();
 			});
 		});
 	});
