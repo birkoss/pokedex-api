@@ -424,7 +424,7 @@ def fetch_page(request, page, page_url, **kwargs):
 		"filters_status": []
 	}
 
-	kwargs['pokemon_hide'] = request.session.get("hide", [])
+	kwargs['pokemon_hide'] = request.session.get("filters", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user
 	kwargs['pokemon_language'] = request.session.get("language", "en")

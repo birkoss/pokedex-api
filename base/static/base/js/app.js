@@ -1,5 +1,6 @@
 /* Use to keep the existing Modal Options when it's first open */
 var ORIGINAL_MODAL_OPTIONS = {};
+var ORIGINAL_MODAL_LANGUAGE = "en";
 
 /* All the filters available in the apps */
 var POKEMON_FILTERS = {
@@ -45,9 +46,10 @@ var INFINITE_SCROLL = null;
 
 /* Change the current language and refresh the Pokemons */
 function change_language(new_language) {
+	/*
 	jQuery.ajax({
 		type: "POST",
-		url: AJAX_FILTERS,
+		url: AJAX_SETTINGS,
 		data: {
 			type: "language",
 			value: new_language,
@@ -56,7 +58,7 @@ function change_language(new_language) {
 		success: function(ret) {
 			ajax_refresh_pokemons();
 		}
-	});
+	});*/
 }
 
 
@@ -70,9 +72,15 @@ function modal_get_options() {
 }
 
 
+/* Get the current selected language from the modal */
+function modal_get_language() {
+	return jQuery("select.language").val();
+}
+
+
 /* Load the filters for the app and show the modal */
 function modal_show_options() {
-	jQuery('#app-modal .modal-body').load(AJAX_FILTERS, function() {
+	jQuery('#app-modal .modal-body').load(AJAX_SETTINGS, function() {
 
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 			jQuery(".pokemon-options").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
@@ -91,12 +99,16 @@ function modal_show_options() {
 			/* @TODO: Add a warning to prevent the user the options were not loaded correctly */
 		}
 
-		ORIGINAL_MODAL_OPTIONS = JSON.stringify(modal_get_options());
+		/* Set the current language */
+		jQuery("#app-modal select.language").val(jQuery("#app-modal select.language").data("language"));
 
-		jQuery("#app-modal input[type='checkbox']").change(function() {
+		ORIGINAL_MODAL_OPTIONS = JSON.stringify(modal_get_options());
+		ORIGINAL_MODAL_LANGUAGE = modal_get_language();
+
+		jQuery("#app-modal input[type='checkbox'],#app-modal select.language").change(function() {
 			/* Disable/enable the SAVE button if the filters are not the same as the original filters the modal had */
 			var current_modal_options = JSON.stringify(modal_get_options());
-			jQuery("#app-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options));
+			jQuery("#app-modal .btn-save").prop("disabled", (ORIGINAL_MODAL_OPTIONS == current_modal_options && ORIGINAL_MODAL_LANGUAGE == modal_get_language()));
 		});
 
 		jQuery('#app-modal .modal-title').html("Filters");
@@ -110,22 +122,26 @@ function modal_show_options() {
 			if (jQuery("#app-modal .btn-save").prop("disabled")) {
 				return;
 			}
-			jQuery("#app-modal .btn-save").prop("disabled", true).html("Saving...");
+			jQuery("#app-modal .btn-save").prop("disabled", true);
 
 			var all_filters = modal_get_options();
 
 			/* Get only the checked filters to save them */
-			var new_filters = [];
+			var settings = {};
+			
+			settings['filters'] = [];
 			for (var single_option in all_filters) {
 				if (all_filters[single_option]) {
-					new_filters.push(single_option);
+					settings['filters'].push(single_option);
 				}
 			}
 
+			settings['language'] = modal_get_language();
+
 			/* Save checked filters */
-			ajax_save_options(new_filters, function(ret) {
+			ajax_save_settings(settings, function(ret) {
 				if (ret['status'] == "ok") {
-					jQuery("#app-modal .btn-save").prop("disabled", false).html("Save");
+					jQuery("#app-modal .btn-save").prop("disabled", false);
 					jQuery('#app-modal').modal('hide');
 
 					ajax_refresh_pokemons();
@@ -234,7 +250,7 @@ function modal_options_update_state(is_owned_checked) {
 
 /* Clear the filters */
 function status_clear_filters() {
-	ajax_save_options([], function(ret) {
+	ajax_save_settings({"filters":[]}, function(ret) {
 		if (ret['status'] == "ok") {
 			ajax_refresh_pokemons();
 		}
@@ -341,13 +357,12 @@ function ajax_save_pokemon_options(pokemon_number, options, callback) {
 
 
 /* Save the options */
-function ajax_save_options(options, callback) {
+function ajax_save_settings(settings, callback) {
 	jQuery.ajax({
 		type: "POST",
-		url: AJAX_FILTERS,
+		url: AJAX_SETTINGS,
 		data: {
-			type: "hide",
-			values: options,
+			"settings": JSON.stringify(settings),
 			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
 		},
 		success: function(ret) {

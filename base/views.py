@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect
 
 from social_django.models import UserSocialAuth
 
+import json
+
 
 def error_404(request, exception=None):
 	return render(request, 'base/404.html')
@@ -17,37 +19,33 @@ def contact(request):
 @login_required
 def user_logout(request):
 	logout(request)
-
 	return redirect('pokemon_archive')
 
 
 @login_required
-def user_filters(request):
+def user_settings(request):
 	if request.method == "POST":
-		setting_name = request.POST.get("type", "")
-		setting_value = ""
+		settings = {}
 
-		if 'value' in request.POST:
-			setting_value = request.POST.get("value", "")
-		else:
-			setting_value = request.POST.getlist("values[]", [])
+		try:
+			settings = json.loads(request.POST.get("settings", {}))
+		except json.decoder.JSONDecodeError:
+			pass
 
+		for single_setting in settings:
+			request.session[single_setting] = settings[single_setting]
+		
 		response = {}
-
-		if setting_name == "":
-			response['status'] = "error"
-			response['msg'] = "The filter and its values are mandatory!"
-			return JsonResponse(response)
-
-		request.session[setting_name] = setting_value
 
 		response['status'] = 'ok'
 
 		return JsonResponse(response)
 	else:
-		pokemon_hide = request.session.get("hide", [])
-		return render(request, 'base/modal_filters.html', {
-			"current_filters": pokemon_hide
+		filters = request.session.get("filters", [])
+		language = request.session.get("language", "en")
+		return render(request, 'base/modal_settings.html', {
+			"current_filters": filters,
+			"current_language": language
 		})
 
 

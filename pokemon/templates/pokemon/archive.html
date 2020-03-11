@@ -9,7 +9,7 @@
 		var AJAX_FIRST_PAGE = "{% url page_url 1 %}";
 	{% endif %}
 	var AJAX_SINGLE_OPTION = "{% url 'pokemon_single_options' "0000" %}";
-	var AJAX_FILTERS = "{% url 'user_filters' %}";
+	var AJAX_SETTINGS = "{% url 'user_settings' %}";
 </script>
 
 
@@ -26,7 +26,7 @@
 	{% endif %}
 </div>
 
-<div class="container-fluid main-pokemons-list{% if 'is_owned' in request.session.hide %} filter-hide-is_owned{% endif %}{% if 'is_shiny' in request.session.hide %} filter-hide-is_shiny{% endif %}{% if 'is_pokeball' in request.session.hide %} filter-hide-is_pokeball{% endif %}{% if 'is_language' in request.session.hide %} filter-hide-is_language{% endif %}{% if 'is_original_trainer' in request.session.hide %} filter-hide-is_original_trainer{% endif %}{% if 'is_iv' in request.session.hide %} filter-hide-is_iv{% endif %}">
+<div class="container-fluid main-pokemons-list">
 
 	<div class="pokemons-grid">
 		<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block; shape-rendering: auto;" width="60px" height="60px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
