@@ -455,8 +455,9 @@ def fetch_page(request, page, page_url, **kwargs):
 
 	page_content['pokedex_stats'] = pokemons_data['pokedex_stats']
 
-	print("Archive Queries")
-	print(connection.queries)
+	# Queries only for admin
+	if request.user.is_authenticated and request.user.is_staff:
+		page_content["queries"] = connection.queries
 
 	page_content['content'] = render_to_string("pokemon/card.html", {
 		'pokemons': pokemons_data['pokemons'],
