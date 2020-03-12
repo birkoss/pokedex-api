@@ -16,7 +16,7 @@
 		{% endcompress %}
 	</head>
 
-	<body class="sb-nav-fixed{% if user.is_authenticated %} logged-in{% endif %}">
+	<body class="sb-nav-fixed{% if user.is_authenticated %} logged-in{% if request.session.search %} search-enable{% endif %}{% endif %}">
 		<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
 			<a class="navbar-brand" href="{% url 'pokemon_archive' %}">Living Pokedex Tracker</a>
 
@@ -29,6 +29,9 @@
 			<!-- Navbar-->
 			<ul class="navbar-nav ml-auto">
 				{% if user.is_authenticated %}
+				<li class="nav-item">
+					<a id="search-toggle" class="nav-link" href="#" onclick="return toggle_search();"><i class="fas fa-search"></i></a>
+				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" id="user-dropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
 					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown">

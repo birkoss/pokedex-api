@@ -44,21 +44,15 @@ var POKEMON_FILTERS = {
 var INFINITE_SCROLL = null;
 
 
-/* Change the current language and refresh the Pokemons */
-function change_language(new_language) {
-	/*
-	jQuery.ajax({
-		type: "POST",
-		url: AJAX_SETTINGS,
-		data: {
-			type: "language",
-			value: new_language,
-			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
-		},
-		success: function(ret) {
-			ajax_refresh_pokemons();
-		}
-	});*/
+
+function toggle_search() {
+	jQuery("body").toggleClass("search-enable");
+
+	ajax_save_settings({
+		"search":jQuery("body").hasClass("search-enable")
+	});
+
+	return false;
 }
 
 
@@ -302,10 +296,11 @@ function status_update_filters(filters) {
 
 
 /* Load the Pokemons list first page */
-function ajax_refresh_pokemons() {
+function ajax_refresh_pokemons(params = {}) {
 	jQuery.ajax({
 		"type": "GET",
 		"url": AJAX_FIRST_PAGE,
+		"data": params,
 		success: function(ret) {
 			jQuery(".pokemons-grid").html(ret['content']);
 
@@ -375,6 +370,17 @@ function ajax_save_settings(settings, callback) {
 
 
 jQuery(document).ready(function() {
+
+	jQuery("#search_text").keyup(function(){
+		var search = jQuery(this).val();
+		var params = {};
+		if (search != "") {
+			params['search'] = search;
+		}
+
+		ajax_refresh_pokemons(params);
+	});
+
 	/* Load the first Pokemon page */
 	if (jQuery(".main-pokemons-list").length) {
 		ajax_refresh_pokemons();

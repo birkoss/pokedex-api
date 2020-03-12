@@ -26,6 +26,14 @@
 	{% endif %}
 </div>
 
+{% if user.is_authenticated %}
+<div class="content-header search-container">
+	<div class="container-fluid">
+		<input type="text" id="search_text" class="form-control" />
+	</div>
+</div>
+{% endif %}
+
 <div class="container-fluid main-pokemons-list">
 
 	<div class="pokemons-grid">

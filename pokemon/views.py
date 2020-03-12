@@ -317,6 +317,10 @@ def fetch_pokemons(**kwargs):
 			'userpokemon', condition=(Q(userpokemon__user=kwargs['user']) | Q(userpokemon__isnull=True))
 		)
 
+		# Apply search
+		if "search_text" in kwargs and kwargs['search_text'] != "":
+			qs_filters.add(Q(**{'name_en__contains':kwargs['search_text']}), Q.AND)
+
 		# Apply settings filters
 		if "settings_filters" in kwargs and len(kwargs['settings_filters']) > 0:
 			pokedex_stats['filters'] = 1
@@ -424,6 +428,7 @@ def fetch_page(request, page, page_url, **kwargs):
 		"filters_status": []
 	}
 
+	kwargs['search_text'] = request.GET.get("search", "")
 	kwargs['settings_filters'] = request.session.get("filters", [])
 	kwargs['page'] = page
 	kwargs['user'] = request.user

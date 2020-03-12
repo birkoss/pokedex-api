@@ -302,3 +302,17 @@ body.logged-in .card.pokemon:not(.is-gender) .option-is_gender {
 	display: none;
 }
 
+/* Search container */
+
+.search-container {
+	display: none;
+}
+
+body.search-enable .search-container {
+	display: block;
+}
+
+body.search-enable #search-toggle {
+	color: #ffffff;
+}
+
