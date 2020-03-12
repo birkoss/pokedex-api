@@ -319,7 +319,22 @@ def fetch_pokemons(**kwargs):
 
 		# Apply search
 		if "search_text" in kwargs and kwargs['search_text'] != "":
-			qs_filters.add(Q(**{'name_en__contains':kwargs['search_text']}), Q.AND)
+			search_number = kwargs['search_text']
+
+			# Pad the number lower than 100 to be like our number : 1 -> 001
+			if len(search_number) < 3:
+				search_number = search_number.zfill(3)
+
+			qs_search = Q()
+			if "pokemon_region" in kwargs and kwargs['pokemon_region'] != "":
+				qs_search.add(Q(**{'pokemonregion__number':search_number}), Q.OR)
+			else:
+				qs_search.add(Q(**{'number':search_number}), Q.OR)
+
+			for single_language in MODELTRANSLATION_LANGUAGES:
+				qs_search.add(Q(**{'name_'+single_language+'__contains':kwargs['search_text']}), Q.OR)
+
+			qs_filters.add(qs_search, Q.AND)
 
 		# Apply settings filters
 		if "settings_filters" in kwargs and len(kwargs['settings_filters']) > 0:
