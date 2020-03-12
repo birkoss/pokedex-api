@@ -383,6 +383,9 @@ jQuery(document).ready(function() {
 
 	/* Load the first Pokemon page */
 	if (jQuery(".main-pokemons-list").length) {
+
+		jQuery("#main-nav").prepend('<li class="nav-item"><a id="search-toggle" class="nav-link" href="#" onclick="return toggle_search();"><i class="fas fa-search"></i></a></li>');
+
 		ajax_refresh_pokemons();
 	}
 });
