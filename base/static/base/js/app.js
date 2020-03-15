@@ -53,6 +53,11 @@ function toggle_search() {
 		"search":jQuery("body").hasClass("search-enable")
 	});
 
+	if (jQuery("body.search-enable").length == 0) {
+		jQuery("#search_text").val("");
+		ajax_refresh_pokemons();
+	}
+
 	return false;
 }
 
@@ -422,7 +427,7 @@ function ajax_save_pokemon_options(pokemon_number, options, callback) {
 function ajax_save_settings(settings, callback) {
 	jQuery.ajax({
 		type: "POST",
-		url: AJAX_PAGES['single_options'],
+		url: AJAX_PAGES['settings'],
 		data: {
 			"settings": JSON.stringify(settings),
 			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
