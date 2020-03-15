@@ -53,11 +53,14 @@
 				{% endif %}
 			</ul>
 		</nav>
-		{% if user.is_authenticated %}
-			<script type="text/javascript">
-				var AJAX_CSRF_TOKEN = "{{ csrf_token }}";
-			</script>
+		<script type="text/javascript">
+			{% if user.is_authenticated %}
+			var AJAX_CSRF_TOKEN = "{{ csrf_token }}";
+			var AJAX_PAGES = {};
+			{% endif %}
+		</script>
 
+		{% if user.is_authenticated %}
 			<div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-title" aria-hidden="true">
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">

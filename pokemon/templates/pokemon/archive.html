@@ -6,13 +6,13 @@
 
 <script type="text/javascript">
 	{% if region %}
-		var AJAX_FIRST_PAGE = "{% url page_url region 1 %}";
+		AJAX_PAGES['first_page'] = "{% url page_url region 1 %}";
 	{% else %}
-		var AJAX_FIRST_PAGE = "{% url page_url 1 %}";
+		AJAX_PAGES['first_page'] = "{% url page_url 1 %}";
 	{% endif %}
-	var AJAX_SINGLE_OPTION = "{% url 'pokemon_single_options' "0000" %}";
-	var AJAX_SETTINGS = "{% url 'user_settings' %}";
-	var AJAX_BULK_EDIT = "{% url 'bulk_edit' %}";
+	AJAX_PAGES['single_options'] = "{% url 'pokemon_single_options' "0000" %}";
+	AJAX_PAGES['settings'] = "{% url 'user_settings' %}";
+	AJAX_PAGES['bulk_edit'] = "{% url 'bulk_edit' %}";
 
 	var AJAX_PAGE_PARAMS = {};
 	{% if region %}

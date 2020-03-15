@@ -74,7 +74,7 @@ function modal_get_language() {
 
 
 function modal_show_bulk_edit() {
-	jQuery('#app-modal .modal-body').load(AJAX_BULK_EDIT, function() {
+	jQuery('#app-modal .modal-body').load(AJAX_PAGES['bulk_edit'], function() {
 		
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 			jQuery('#pokemon-option').append(new Option(POKEMON_FILTERS[single_filter]['name'], single_filter))
@@ -117,7 +117,7 @@ function modal_show_bulk_edit() {
 
 			jQuery.ajax({
 				type: "POST",
-				url: AJAX_BULK_EDIT,
+				url: AJAX_PAGES['bulk_edit'],
 				data: ajax_data,
 				success: function(ret) {
 					if (ret['status'] == "ok") {
@@ -133,7 +133,7 @@ function modal_show_bulk_edit() {
 
 /* Load the filters for the app and show the modal */
 function modal_show_options() {
-	jQuery('#app-modal .modal-body').load(AJAX_SETTINGS, function() {
+	jQuery('#app-modal .modal-body').load(AJAX_PAGES['single_options'], function() {
 
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 			jQuery(".pokemon-options").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
@@ -210,7 +210,7 @@ function modal_show_options() {
 
 /* Load the options for this pokemon and show the modal */
 function modal_show_pokemon_options(pokemon_number) {
-	jQuery('#app-modal .modal-body').load(AJAX_SINGLE_OPTION.replace("0000", pokemon_number), function() {
+	jQuery('#app-modal .modal-body').load(AJAX_PAGES['single_options'].replace("0000", pokemon_number), function() {
 
 		/* Create all options in the modal */
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {		
@@ -366,7 +366,7 @@ function ajax_refresh_pokemons(params = {}) {
 
 	jQuery.ajax({
 		"type": "GET",
-		"url": AJAX_FIRST_PAGE,
+		"url": AJAX_PAGES['first_page'],
 		"data": params,
 		success: function(ret) {
 			jQuery(".pokemons-grid").html(ret['content']);
@@ -404,7 +404,7 @@ function ajax_refresh_pokemons(params = {}) {
 function ajax_save_pokemon_options(pokemon_number, options, callback) {
 	jQuery.ajax({
 		type: "POST",
-		url: AJAX_SINGLE_OPTION.replace("0000", pokemon_number),
+		url: AJAX_PAGES['single_options'].replace("0000", pokemon_number),
 		data: {
 			"options": JSON.stringify(options),
 			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
@@ -422,7 +422,7 @@ function ajax_save_pokemon_options(pokemon_number, options, callback) {
 function ajax_save_settings(settings, callback) {
 	jQuery.ajax({
 		type: "POST",
-		url: AJAX_SETTINGS,
+		url: AJAX_PAGES['single_options'],
 		data: {
 			"settings": JSON.stringify(settings),
 			"csrfmiddlewaretoken": AJAX_CSRF_TOKEN
