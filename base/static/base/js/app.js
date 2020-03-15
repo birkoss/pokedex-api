@@ -120,7 +120,9 @@ function modal_show_bulk_edit() {
 				url: AJAX_BULK_EDIT,
 				data: ajax_data,
 				success: function(ret) {
-					console.log(ret);
+					if (ret['status'] == "ok") {
+						ajax_refresh_pokemons();
+					}
 				}
 			});
 		});
