@@ -5,10 +5,10 @@
 			<p class="pokemon_number">{{ pokemon.visible_number }}</p>
 			<h5>{{ pokemon.name }}</h5>
 			{% if is_logged %}
-				<a href="#" onclick="return modal_show_pokemon_options('{{ pokemon.number }}');" class="btn btn-primary"><i class="fas fa-cogs"></i></a>
-				<a href="{% url 'pokemon_single' pokemon.number %}" class="btn btn-primary"><i class="fas fa-angle-double-right"></i></a>
+				<a href="#" onclick="return modal_show_pokemon_options('{{ pokemon.number }}');" class="btn btn-primary"><i class="fas fa-check-square"></i></a>
+				<a href="{% url 'pokemon_single' pokemon.number %}" class="btn btn-primary"><i class="fas fa-info-circle"></i></a>
 			{% else %}
-				<a href="{% url 'pokemon_single' pokemon.number %}" class="btn btn-primary"><i class="fas fa-angle-double-right"></i></a>
+				<a href="{% url 'pokemon_single' pokemon.number %}" class="btn btn-primary"><i class="fas fa-info-circle"></i></a>
 			{% endif %}
 
 			{% if is_logged %}

@@ -104,9 +104,81 @@ def pokemon_options(request, pokemon_number):
 		return JsonResponse(response)
 
 
+@login_required
+def bulk_edit(request):
+	if request.method == "GET":
+			request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
+
+			if request_header_requested_with != "XMLHttpRequest":
+				return redirect('pokemon_archive')
+
+			return render(request, "pokemon/modal_bulk_edit.html")
+
+
+	if request.method == "POST":
+		response = {
+			"status": "pending"
+		}
+
+		kwargs = {
+			"user": request.user
+		}
+
+		pokemon_type = request.POST.get("type", "")
+		pokemon_region = request.POST.get("region", "")
+		action = request.POST.get("action", "")
+		option = request.POST.get("option", "")
+		search_text = request.POST.get("search", "")
+
+		if action == "" or option == "" or action not in ['set','unset']:
+			response['status'] = "error"
+			response['msg'] = "Invalid option or action!"
+			return JsonResponse(response)	
+
+		if pokemon_type != "":
+			kwargs['pokemon_type'] = pokemon_type
+
+		if search_text != "":
+			kwargs['search_text'] = search_text
+
+		if pokemon_region != "":
+			kwargs['pokemon_region'] = pokemon_region
+
+		pokemons_data = fetch_pokemons(**kwargs)
+		pokemons = pokemons_data['pokemons']
+
+		# @TODO: Check for valid option first!
+		for single_pokemon in pokemons:
+			if action == "unset":
+				if single_pokemon[option] == True:
+					UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: False})
+			elif action == "set":
+				if single_pokemon[option] != True:
+					if single_pokemon[option] == False:
+						UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: True})
+					else:
+						print("NEW!!")
+						user_pokemon = UserPokemon(user=request.user, pokemon=Pokemon.objects.filter(number=single_pokemon['number']).first())
+						setattr(user_pokemon, option, True)
+						user_pokemon.save()
+						print(Pokemon.objects.filter(number=single_pokemon['number']).first())
+						print("Create : " + single_pokemon['number'])
+
+		# If unset and Pokemons in list, unset field
+
+		# If set
+		# if Pokemons in list (and set), unset it
+		# else, add it set
+
+		response['status'] = "ok"
+		response['data'] = pokemons
+
+		return JsonResponse(response)
+
 def pokemon_archive(request):
 	return render(request, "pokemon/archive.html", {
 		"page_url": "pokemon_archive_page",
+		"type": "pokemons",
 		"page_title": "National Pokedex"
 	})
 
@@ -114,6 +186,7 @@ def pokemon_archive(request):
 def pokemon_forms_archive(request):
 	return render(request, "pokemon/archive.html", {
 		"page_url": "pokemon_forms_archive_page",
+		"type": "forms",
 		"page_title": "Alternate Forms"
 	})
 
@@ -468,9 +541,12 @@ def fetch_page(request, page, page_url, **kwargs):
 		pagination_args = {
 			'page_url': page_url,
 			'paginator': pokemons_data['paginator'],
+			'querystring': ''
 		}
 		if "pokemon_region" in kwargs:
 			pagination_args['pokemon_region'] = kwargs['pokemon_region']
+		if kwargs['search_text'] != "":
+			pagination_args['querystring'] = "?search=" + kwargs['search_text']
 		page_content['content'] += render_to_string("pokemon/pagination.html", pagination_args)
 
 	return page_content

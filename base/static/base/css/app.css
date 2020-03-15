@@ -118,7 +118,7 @@ a.nav-link.active {
 }
 
 @media screen and (max-width: 525px) {
-	.total-pokemons-status > span {
+	.total-pokemons-status > span.suffix, .total-pokemons-status > span.prefix {
 		display: none;
 	}
 	.content-header > div h1 {

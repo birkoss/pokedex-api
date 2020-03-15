@@ -12,6 +12,15 @@
 	{% endif %}
 	var AJAX_SINGLE_OPTION = "{% url 'pokemon_single_options' "0000" %}";
 	var AJAX_SETTINGS = "{% url 'user_settings' %}";
+	var AJAX_BULK_EDIT = "{% url 'bulk_edit' %}";
+
+	var AJAX_PAGE_PARAMS = {};
+	{% if region %}
+	AJAX_PAGE_PARAMS['region'] = '{{ region }}';
+	{% endif %}
+	{% if type %}
+	AJAX_PAGE_PARAMS['type'] = '{{ type }}';
+	{% endif %}
 </script>
 
 <div class="content-header">

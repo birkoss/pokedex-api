@@ -19,8 +19,8 @@ urlpatterns = [
 	path('forms', pokemon_views.pokemon_forms_archive, name='pokemon_forms_archive'),
 	path('forms/page/<int:page>', pokemon_views.pokemon_forms_archive_page, name='pokemon_forms_archive_page'),
 
-	path('pokedex/<str:region>/page/<int:page>', pokemon_views.pokemon_pokedex_archive_page, name='pokemon_pokedex_archive_page'),
 	path('pokedex/<str:region>', pokemon_views.pokemon_pokedex_archive, name='pokemon_pokedex_archive'),
+	path('pokedex/<str:region>/page/<int:page>', pokemon_views.pokemon_pokedex_archive_page, name='pokemon_pokedex_archive_page'),
 
 	# Single Pokemon page
 	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_single, name='pokemon_single'),
@@ -28,6 +28,8 @@ urlpatterns = [
 	# Single Pokemon Options (for the modal) 
 	path('pokemon/<str:pokemon_number>/options', pokemon_views.pokemon_options, name='pokemon_single_options'),
 	
+	path('bulk-edit', pokemon_views.bulk_edit, name='bulk_edit'),
+
 	path('settings', base_views.user_settings, name='user_settings'),
 	path('logout', base_views.user_logout, name='logout'),
 	path('profile', base_views.user_profile, name='user_profile'),

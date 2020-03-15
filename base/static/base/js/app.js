@@ -73,6 +73,62 @@ function modal_get_language() {
 }
 
 
+function modal_show_bulk_edit() {
+	jQuery('#app-modal .modal-body').load(AJAX_BULK_EDIT, function() {
+		
+		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
+			jQuery('#pokemon-option').append(new Option(POKEMON_FILTERS[single_filter]['name'], single_filter))
+		});
+
+		/* Get the total pokemons from the last query */
+		jQuery('#app-modal strong.total-count').html(jQuery("span.total").html());
+
+		jQuery('#app-modal .modal-title').html("Bulk Edit");
+		jQuery('#app-modal').modal({show:true});
+		jQuery("#app-modal .btn-save").prop("disabled", true);
+
+		/* Watch for both SELECT to have a valid value to enable the SAVE button */
+		jQuery("#app-modal select#pokemon-option,#app-modal select#pokemon-action").change(function() {
+			jQuery("#app-modal .btn-save").prop("disabled", (jQuery("#app-modal select#pokemon-option").val() == "" || jQuery("#app-modal select#pokemon-action").val() == ""));
+		});
+
+		/* Save it */
+		jQuery("#app-modal .btn-save").unbind("click").click(function() {
+			/* Do NOT allow saving while it's already in process */
+			if (jQuery("#app-modal .btn-save").prop("disabled")) {
+				return;
+			}
+			jQuery("#app-modal .btn-save").prop("disabled", true);
+
+			var ajax_data = {
+				"csrfmiddlewaretoken": AJAX_CSRF_TOKEN,
+				"option": jQuery("#app-modal select#pokemon-option").val(),
+				"action": jQuery("#app-modal select#pokemon-action").val()
+			}
+
+			for (var key in AJAX_PAGE_PARAMS) {
+				ajax_data[key] = AJAX_PAGE_PARAMS[key];
+			}
+
+			var search_text = jQuery("#search_text").val();
+			if (search_text != "") {
+				ajax_data["search"] = search_text;
+			}
+
+			jQuery.ajax({
+				type: "POST",
+				url: AJAX_BULK_EDIT,
+				data: ajax_data,
+				success: function(ret) {
+					console.log(ret);
+				}
+			});
+		});
+
+	});
+}
+
+
 /* Load the filters for the app and show the modal */
 function modal_show_options() {
 	jQuery('#app-modal .modal-body').load(AJAX_SETTINGS, function() {
@@ -259,13 +315,13 @@ function status_update_pokedex_stats(pokedex_stats) {
 
 	if (pokedex_stats['anonymous'] == 1) {
 		/* Unlogged status, only the total */
-		content = pokedex_stats['total'] + " Pokemon(s)";
+		content = '<span class="total">' + pokedex_stats['total'] + "</span> Pokemon(s)";
 	} else {
 		/* Logged user without filters */
 		if (pokedex_stats['filters'] == 0) {
-			content = "<span class='prefix'>Remaining: </span>" + (pokedex_stats['total']-pokedex_stats['count_is_owned']) + " / " + pokedex_stats['total'] + "<span class='suffix'> Pokemon(s)</span>";
+			content = "<span class='prefix'>Remaining: </span>" + (pokedex_stats['total']-pokedex_stats['count_is_owned']) + " / <span class='total'>" + pokedex_stats['total'] + "</span><span class='suffix'> Pokemon(s)</span>";
 		} else {
-			content = "<span class='prefix'>Remaining: </span>" + pokedex_stats['current'] + " / " + pokedex_stats['total'] + "<span class='suffix'> Pokemon(s)</span>";
+			content = "<span class='prefix'>Remaining: </span>" + pokedex_stats['current'] + " / <span class='total'>" + pokedex_stats['total'] + "</span><span class='suffix'> Pokemon(s)</span>";
 		}
 	}
 
@@ -324,11 +380,11 @@ function ajax_refresh_pokemons(params = {}) {
 			jQuery(".dropdown-language .lang-" + ret['pokemon_language'] + " .fa-check").show();
 
 			/* Setup the infinite scroll if any pagination is present */
+			if (INFINITE_SCROLL != null) {
+				jQuery('.pokemons-grid').infiniteScroll("destroy");
+				INFINITE_SCROLL = null;
+			}
 			if (jQuery(".pagination-next").length) {
-				if (INFINITE_SCROLL != null) {
-					jQuery('.pokemons-grid').infiniteScroll("destroy");
-					INFINITE_SCROLL = null;
-				}
 				INFINITE_SCROLL = jQuery('.pokemons-grid').infiniteScroll({
 					path: '.pagination-next',
 					append: '.card.pokemon',
