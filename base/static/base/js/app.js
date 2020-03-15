@@ -46,6 +46,7 @@ var POKEMON_FILTERS = {
 var INFINITE_SCROLL = null;
 
 
+/* Toggle the search INPUT and save it for future reference */
 function toggle_search() {
 	jQuery("body").toggleClass("search-enable");
 
@@ -78,6 +79,7 @@ function modal_get_language() {
 }
 
 
+/* Load the bulk edit modal and show it */
 function modal_show_bulk_edit() {
 	jQuery('#app-modal .modal-body').load(AJAX_PAGES['bulk_edit'], function() {
 		
