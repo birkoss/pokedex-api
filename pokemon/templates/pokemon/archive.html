@@ -5,11 +5,7 @@
 {% block content %}
 
 <script type="text/javascript">
-	{% if region %}
-		AJAX_PAGES['first_page'] = "{% url page_url region 1 %}";
-	{% else %}
-		AJAX_PAGES['first_page'] = "{% url page_url 1 %}";
-	{% endif %}
+	AJAX_PAGES['page'] = "{% url 'pokemons_page' 1 %}";
 	AJAX_PAGES['single_options'] = "{% url 'pokemon_single_options' "0000" %}";
 	AJAX_PAGES['settings'] = "{% url 'user_settings' %}";
 	AJAX_PAGES['bulk_edit'] = "{% url 'bulk_edit' %}";

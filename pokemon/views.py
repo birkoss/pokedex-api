@@ -157,27 +157,18 @@ def bulk_edit(request):
 					if single_pokemon[option] == False:
 						UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: True})
 					else:
-						print("NEW!!")
 						user_pokemon = UserPokemon(user=request.user, pokemon=Pokemon.objects.filter(number=single_pokemon['number']).first())
 						setattr(user_pokemon, option, True)
 						user_pokemon.save()
-						print(Pokemon.objects.filter(number=single_pokemon['number']).first())
-						print("Create : " + single_pokemon['number'])
-
-		# If unset and Pokemons in list, unset field
-
-		# If set
-		# if Pokemons in list (and set), unset it
-		# else, add it set
 
 		response['status'] = "ok"
-		response['data'] = pokemons
+		response['queries'] = connection.queries
 
 		return JsonResponse(response)
 
+
 def pokemon_archive(request):
 	return render(request, "pokemon/archive.html", {
-		"page_url": "pokemon_archive_page",
 		"type": "pokemons",
 		"page_title": "National Pokedex"
 	})
@@ -185,7 +176,6 @@ def pokemon_archive(request):
 
 def pokemon_forms_archive(request):
 	return render(request, "pokemon/archive.html", {
-		"page_url": "pokemon_forms_archive_page",
 		"type": "forms",
 		"page_title": "Alternate Forms"
 	})
@@ -198,44 +188,32 @@ def pokemon_pokedex_archive(request, region=None):
 		redirect('pokemon_archive')
 
 	return render(request, "pokemon/archive.html", {
-		"page_url": "pokemon_pokedex_archive_page",
 		"region": region,
 		"page_title": "Pokemons from " + single_region.name
 	})
 
 
-def pokemon_pokedex_archive_page(request, region=None, page=1):
+def pokemons_page(request, page=1):
+	pokemon_type = request.GET.get("type", "")
+	pokemon_region = request.GET.get("region", "")
+	search_text = request.GET.get("search", "")
+
 	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
 	if request_header_requested_with != "XMLHttpRequest":
-		return redirect('pokemon_pokedex_archive', region=region)
+		if pokemon_type != "":
+			return redirect("pokemon_forms_archive" if pokemon_type == "forms" else "pokemon_archive")
+		elif pokemon_region != "":
+			return redirect('pokemon_pokedex_archive', region=pokemon_region)
 
-	page_content = fetch_page(request, page, 'pokemon_pokedex_archive_page', **{'pokemon_region':region})
+	kwargs = {}
 
-	if page == 1:
-		return JsonResponse(page_content)
-	else:
-		return HttpResponse(page_content['content'])
+	if pokemon_region != "":
+		kwargs['pokemon_region'] = pokemon_region
 
+	if pokemon_type != "":
+		kwargs['pokemon_type'] = pokemon_type
 
-def pokemon_archive_page(request, page=1):
-	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
-	if request_header_requested_with != "XMLHttpRequest":
-		return redirect('pokemon_archive')
-
-	page_content = fetch_page(request, page, 'pokemon_archive_page', **{'pokemon_type':"pokemons"})
-
-	if page == 1:
-		return JsonResponse(page_content)
-	else:
-		return HttpResponse(page_content['content'])
-
-
-def pokemon_forms_archive_page(request, page=1):
-	request_header_requested_with = request.META.get("HTTP_X_REQUESTED_WITH", "")
-	if request_header_requested_with != "XMLHttpRequest":
-		return redirect('pokemon_forms_archive')
-
-	page_content = fetch_page(request, page, 'pokemon_forms_archive_page', **{'pokemon_type':"forms"})
+	page_content = fetch_page(request, page, 'pokemons_page', **kwargs)
 
 	if page == 1:
 		return JsonResponse(page_content)
@@ -545,8 +523,11 @@ def fetch_page(request, page, page_url, **kwargs):
 		}
 		if "pokemon_region" in kwargs:
 			pagination_args['pokemon_region'] = kwargs['pokemon_region']
-		if kwargs['search_text'] != "":
-			pagination_args['querystring'] = "?search=" + kwargs['search_text']
+
+		pagination_args['querystring'] = request.GET.urlencode()
+		if pagination_args['querystring'] != "":
+			pagination_args['querystring'] = "?" + pagination_args['querystring']
+
 		page_content['content'] += render_to_string("pokemon/pagination.html", pagination_args)
 
 	return page_content

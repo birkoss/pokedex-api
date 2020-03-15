@@ -1,7 +1,7 @@
 {% if paginator.has_other_pages %}
 	<ul class="pagination">
 		{% if paginator.has_previous %}
-			<li class="page-item"><a class="page-link" href="{% if pokemon_region %}{% url page_url pokemon_region paginator.previous_page_number %}{% else %}{% url page_url paginator.previous_page_number %}{% endif %}{{ querystring }}">&laquo;</a></li>
+			<li class="page-item"><a class="page-link" href="{% url page_url paginator.previous_page_number %}{{ querystring }}">&laquo;</a></li>
 		{% else %}
 			<li class="page-item disabled"><span class="page-link">&laquo;</span></li>
 		{% endif %}
@@ -12,12 +12,12 @@
 			{% elif i == 0 %}
 				<li class="page-item"><a class="page-link" href="{% url 'pokemon_archive' %}{{ querystring }}">{{ i }}</a></li>
 			{% else %}
-				<li class="page-item"><a class="page-link" href="{% if pokemon_region %}{% url page_url pokemon_region i %}{% else %}{% url page_url i %}{% endif %}{{ querystring }}">{{ i }}</a></li>
+				<li class="page-item"><a class="page-link" href="{% url page_url i %}{{ querystring }}">{{ i }}</a></li>
 			{% endif %}
 		{% endfor %}
 
 		{% if paginator.has_next %}
-			<li class="page-item"><a class="page-link pagination-next" href="{% if pokemon_region %}{% url page_url pokemon_region paginator.next_page_number %}{% else %}{% url page_url paginator.next_page_number %}{% endif %}{{ querystring }}">&raquo;</a></li>
+			<li class="page-item"><a class="page-link pagination-next" href="{% url page_url paginator.next_page_number %}{{ querystring }}">&raquo;</a></li>
 		{% else %}
 			<li class="page-item disabled"><span class="page-link">&raquo;</span></li>
 		{% endif %}

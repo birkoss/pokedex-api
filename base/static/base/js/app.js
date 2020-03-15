@@ -128,6 +128,9 @@ function modal_show_bulk_edit() {
 				data: ajax_data,
 				success: function(ret) {
 					if (ret['status'] == "ok") {
+						jQuery("#app-modal .btn-save").prop("disabled", false);
+						jQuery('#app-modal').modal('hide');
+						
 						ajax_refresh_pokemons();
 					}
 				}
@@ -368,12 +371,15 @@ function ajax_refresh_pokemons(params = {}) {
 	if (search != "") {
 		params['search'] = search;
 	}
+	for (var key in AJAX_PAGE_PARAMS) {
+		params[key] = AJAX_PAGE_PARAMS[key];
+	}
 
 	jQuery(".pokemons-grid").html(AJAX_LOADING);
 
 	jQuery.ajax({
 		"type": "GET",
-		"url": AJAX_PAGES['first_page'],
+		"url": AJAX_PAGES['page'],
 		"data": params,
 		success: function(ret) {
 			jQuery(".pokemons-grid").html(ret['content']);

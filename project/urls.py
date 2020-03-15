@@ -12,15 +12,14 @@ handler404 = 'base.views.error_404'
 urlpatterns = [
 	path('admin/', admin.site.urls),
 
+	path('pokemons/<int:page>', pokemon_views.pokemons_page, name='pokemons_page'),
+
 	# Archive Pokemon
 	path('', pokemon_views.pokemon_archive, name='pokemon_archive'),
-	path('page/<int:page>', pokemon_views.pokemon_archive_page, name='pokemon_archive_page'),
 
 	path('forms', pokemon_views.pokemon_forms_archive, name='pokemon_forms_archive'),
-	path('forms/page/<int:page>', pokemon_views.pokemon_forms_archive_page, name='pokemon_forms_archive_page'),
 
 	path('pokedex/<str:region>', pokemon_views.pokemon_pokedex_archive, name='pokemon_pokedex_archive'),
-	path('pokedex/<str:region>/page/<int:page>', pokemon_views.pokemon_pokedex_archive_page, name='pokemon_pokedex_archive_page'),
 
 	# Single Pokemon page
 	path('pokemon/<str:pokemon_number>/', pokemon_views.pokemon_single, name='pokemon_single'),
