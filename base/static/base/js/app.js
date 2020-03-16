@@ -130,7 +130,7 @@ function modal_show_bulk_edit() {
 					if (ret['status'] == "ok") {
 						jQuery("#app-modal .btn-save").prop("disabled", false);
 						jQuery('#app-modal').modal('hide');
-						
+
 						ajax_refresh_pokemons();
 					}
 				}
@@ -143,7 +143,7 @@ function modal_show_bulk_edit() {
 
 /* Load the filters for the app and show the modal */
 function modal_show_options() {
-	jQuery('#app-modal .modal-body').load(AJAX_PAGES['single_options'], function() {
+	jQuery('#app-modal .modal-body').load(AJAX_PAGES['settings'], function() {
 
 		Object.keys(POKEMON_FILTERS).forEach(function(single_filter) {
 			jQuery(".pokemon-options").append('<div class="form-group form-check"><div class=""><input class="form-check-input" type="checkbox" id="' + single_filter + '" /><label class="form-check-label" for="' + single_filter + '" data-toggle="tooltip" data-placement="top">' + POKEMON_FILTERS[single_filter]['name'] + ' <i class="' + POKEMON_FILTERS[single_filter]['icon'] + '"></i></label></div></div>');
@@ -331,7 +331,7 @@ function status_update_pokedex_stats(pokedex_stats) {
 	} else {
 		/* Logged user without filters */
 		if (pokedex_stats['filters'] == 0) {
-			content = "<span class='prefix'>Remaining: </span>" + (pokedex_stats['total']-pokedex_stats['count_is_owned']) + " / <span class='total'>" + pokedex_stats['total'] + "</span><span class='suffix'> Pokemon(s)</span>";
+			content = "<span class='prefix'>Remaining: </span>" + pokedex_stats['count_is_owned'] + " / <span class='total'>" + pokedex_stats['total'] + "</span><span class='suffix'> Pokemon(s)</span>";
 		} else {
 			content = "<span class='prefix'>Remaining: </span>" + pokedex_stats['current'] + " / <span class='total'>" + pokedex_stats['total'] + "</span><span class='suffix'> Pokemon(s)</span>";
 		}
