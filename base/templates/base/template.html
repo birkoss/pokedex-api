@@ -54,9 +54,9 @@
 			</ul>
 		</nav>
 		<script type="text/javascript">
+			var AJAX_PAGES = {};
 			{% if user.is_authenticated %}
 			var AJAX_CSRF_TOKEN = "{{ csrf_token }}";
-			var AJAX_PAGES = {};
 			{% endif %}
 		</script>
 

@@ -147,19 +147,40 @@ def bulk_edit(request):
 		pokemons_data = fetch_pokemons(**kwargs)
 		pokemons = pokemons_data['pokemons']
 
+		options_to_set = []
+		options_to_unset = []
+		options_to_create = []
+
 		# @TODO: Check for valid option first!
 		for single_pokemon in pokemons:
 			if action == "unset":
 				if single_pokemon[option] == True:
-					UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: False})
+					#UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: False})
+					options_to_unset.append(single_pokemon['number'])
 			elif action == "set":
 				if single_pokemon[option] != True:
 					if single_pokemon[option] == False:
-						UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: True})
+						#UserPokemon.objects.filter(user=request.user, pokemon__number=single_pokemon['number']).update(**{option: True})
+						options_to_set.append(single_pokemon['number'])
 					else:
-						user_pokemon = UserPokemon(user=request.user, pokemon=Pokemon.objects.filter(number=single_pokemon['number']).first())
-						setattr(user_pokemon, option, True)
-						user_pokemon.save()
+						options_to_create.append(single_pokemon['number'])
+						#user_pokemon = UserPokemon(user=request.user, pokemon=Pokemon.objects.filter(number=single_pokemon['number']).first())
+						#setattr(user_pokemon, option, True)
+						#user_pokemon.save()
+						#options_to_create.append(UserPokemon(user=request.user, **{option: True}, pokemon__id=single_pokemon['pk']))
+
+		if len(options_to_unset) > 0:
+			UserPokemon.objects.filter(user=request.user, pokemon__number__in=options_to_unset).update(**{option: False})
+		
+		if len(options_to_set) > 0:
+			UserPokemon.objects.filter(user=request.user, pokemon__number__in=options_to_set).update(**{option: True})
+
+		if len(options_to_create) > 0:
+			existing_pokemons = Pokemon.objects.filter(**{"number__in":options_to_create})
+			user_pokemons = []
+			for single_pokemon in existing_pokemons:
+				user_pokemons.append(UserPokemon(user=request.user, **{option: True}, pokemon=single_pokemon))
+			UserPokemon.objects.bulk_create(user_pokemons)
 
 		response['status'] = "ok"
 		response['queries'] = connection.queries
