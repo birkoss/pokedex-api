@@ -351,6 +351,7 @@ def fetch_pokemons(**kwargs):
 	pagination = 40
 
 	qs_annotate = {}
+	qs_annotate_total = {}
 	qs_values = ["name", "number", "variant__name", "variant__number"]
 
 	qs_filters = Q()
@@ -475,7 +476,7 @@ def fetch_pokemons(**kwargs):
 
 		# Add all the count of the filters 
 		for single_filter in pokemon_filters:
-			qs_aggregate['count_' + single_filter] = Count(Case(When(**{'userpokemon__'+single_filter: True}, then=Value(1))))
+			qs_aggregate['count_' + single_filter] = Count(Case(When(**{'userpokemon__'+single_filter: True}, then=Value(1))), filter=Q(userpokemon__user=kwargs['user']))
 
 
 		pokemons_total_qs = get_pokemon_queryset(qs_annotate, qs_filters, qs_values, qs_order_by).aggregate(
@@ -489,6 +490,7 @@ def fetch_pokemons(**kwargs):
 			pokedex_stats['count_' + single_filter] = pokemons_total_qs['count_' + single_filter]
 
 
+		print(connection.queries)
 	return {
 		"pokemons": pokemons_list,
 		"paginator": pokemons_paginator,
