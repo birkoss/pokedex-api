@@ -375,7 +375,7 @@ function ajax_refresh_pokemons(params = {}) {
 		params[key] = AJAX_PAGE_PARAMS[key];
 	}
 
-	jQuery(".pokemons-grid").html(AJAX_LOADING);
+	jQuery(".loading-animation,.loading-overlay").addClass("show");
 
 	jQuery.ajax({
 		"type": "GET",
@@ -408,6 +408,8 @@ function ajax_refresh_pokemons(params = {}) {
 					status: '.page-load-status'
 				});
 			}
+
+			jQuery(".loading-animation,.loading-overlay").removeClass("show");
 		}
 	});
 }
@@ -451,6 +453,7 @@ function ajax_save_settings(settings, callback) {
 
 jQuery(document).ready(function() {
 
+	jQuery(".loading-animation").html(AJAX_LOADING);
 	jQuery(".infinite-scroll-request").html(AJAX_LOADING);
 
 	jQuery("#search_text").keyup(function(){
