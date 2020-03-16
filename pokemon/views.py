@@ -413,7 +413,7 @@ def fetch_pokemons(**kwargs):
 		if "settings_filters" in kwargs and len(kwargs['settings_filters']) > 0:
 			pokedex_stats['filters'] = 1
 			for single_filter in kwargs['settings_filters']:
-				qs_filters_hidden.add(Q(**{'t__' + single_filter:False}) | Q(userpokemon__isnull=True), Q.AND)
+				qs_filters_hidden.add(Q(**{'t__' + single_filter:False}) | Q(t__isnull=True), Q.AND)
 
 
 	# Get the Pokemons depending on all the differents settings
