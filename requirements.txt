@@ -8,7 +8,7 @@ django-compressor==2.4
 django-modeltranslation==0.14.4
 idna==2.9
 oauthlib==3.1.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 python3-openid==3.1.0
 pytz==2019.3
 rcssmin==1.0.6
